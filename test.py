@@ -24,8 +24,8 @@ def click(pinchFlag, conts):
     cy = int(y + h / 2)
     cv2.circle(img, (cx, cy), int((w + h) / 4), (0, 0, 255), 2)
 
-    if (pinchFlag == 0):  # perform only if pinch is off
-        pinchFlag = 1  # setting pinch flag on
+    if not pinchFlag :  # perform only if pinch is off
+        pinchFlag = True  # setting pinch flag on
         mouse.press(Button.left)
 
     mouseLoc = (sx - (cx * sx / camx), cy * sy / camy)
@@ -49,7 +49,7 @@ sx = root.winfo_screenwidth()
 sy = root.winfo_screenheight()
 camx,camy = 340,220
 print(sx,sy)
-pinchFlag = 0
+pinchFlag = False
 
 while True:
     # Read every frame from the cam and normalize the image
@@ -73,9 +73,6 @@ while True:
     cv2.drawContours(img, conts, -1, (255,0,0), 3)
 
     if conts:
-        # else:
-        mouse.release(Button.left)
-
         # Wrap in a rectangle every object that get into the camera ROV
         for obj in range(0, len(conts)):
             x, y, w, h = cv2.boundingRect(conts[obj])
@@ -87,19 +84,22 @@ while True:
 
         # Draws a center for the main image to track
         cv2.circle(img, (x1, y1), 2, (0, 0, 255), 2)
-        mouseLoc = (sx - (x1 * sx / camx), y1 * sy / camy)
-        if (pinchFlag == 1):  # perform only if pinch is on
-            pinchFlag = 0  # setting pinch flag off
 
-        if n_objects == 1:
-            mouseLoc, pinchFlag = click(pinchFlag, conts)
+        if (pinchFlag):  # perform only if pinch is on
+            pinchFlag = False
+            mouse.release(Button.left)
 
         # Compute mouse location
+        mouseLoc = (sx - (x1 * sx / camx), y1 * sy / camy)
+        # mouse.position = mouseLoc
+
+        # If there is only one object, it means both finger
+        # (objects) collided so a click take place
+        if n_objects == 1:
+            print("click")
+            mouseLoc, pinchFlag = click(pinchFlag, conts)
+
         mouse.position = mouseLoc
-
-    else:
-        mouse.release(Button.left)
-
 
     # Release every frame
     cv2.imshow("cam",img)
