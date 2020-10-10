@@ -1,22 +1,10 @@
 import numpy as np
 import cv2
 
-def center(contours, frame):
-    # calculate moments for each contour
-    for c in contours:
-        M = cv2.moments(c)
+lowerBound = np.array([41,0,0])
+upperBound = np.array([79, 255, 255])
 
-        if M["m00"] != 0:
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-        else:
-            cX, cY = 0, 0
-        tempStr = str(cX) + ", " + str(cY)
-        cv2.circle(frame, (cX, cY), 1, (0, 0, 0), -1) #make a dot at the center of the object 
-        cv2.putText(frame, tempStr, (cX - 25, cY - 25),cv2.FONT_HERSHEY_TRIPLEX, 0.4, (0, 0, 0), 1) 
-        #print the coordinates on the image
     
-
 def segmentation(mirror=False):
     
     cv2.namedWindow("color_hsv",1)
@@ -37,16 +25,14 @@ def segmentation(mirror=False):
     sl = 'saturation low'
     vh = 'value high'
     vl = 'value low'
-    mode = 'mode'
 
     #set ranges
-    cv2.createTrackbar(hh, "color_hsv", 0,179, nothing)
-    cv2.createTrackbar(hl, "color_hsv", 0,179, nothing)
-    cv2.createTrackbar(sh, "color_hsv", 0,255, nothing)
-    cv2.createTrackbar(sl, "color_hsv", 0,255, nothing)
-    cv2.createTrackbar(vh, "color_hsv", 0,255, nothing)
-    cv2.createTrackbar(vl, "color_hsv", 0,255, nothing)
-    cv2.createTrackbar(mode, "color_hsv", 0,3, nothing)
+    cv2.createTrackbar(hh, "color_hsv", upperBound[0],179, nothing)
+    cv2.createTrackbar(hl, "color_hsv", lowerBound[0],179, nothing)
+    cv2.createTrackbar(sh, "color_hsv", upperBound[1],255, nothing)
+    cv2.createTrackbar(sl, "color_hsv", lowerBound[1],255, nothing)
+    cv2.createTrackbar(vh, "color_hsv", upperBound[2],255, nothing)
+    cv2.createTrackbar(vl, "color_hsv", lowerBound[2],255, nothing)
 
     thv= 'th1'
     
@@ -66,8 +52,6 @@ def segmentation(mirror=False):
         val= cv2.getTrackbarPos(vl,"color_hsv")
         vah= cv2.getTrackbarPos(vh,"color_hsv")
         thva= cv2.getTrackbarPos(thv,"color_hsv")
-
-        modev= cv2.getTrackbarPos(mode,"color_hsv")
 
         hsvl = np.array([hul, sal, val], np.uint8)
         hsvh = np.array([huh, sah, vah], np.uint8)
@@ -91,7 +75,7 @@ def segmentation(mirror=False):
             cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255), 2)
             # cv2.cv.PutText(cv2.cv.fromarray(img), str(i+1),(x,y+h),font,(0,255,255))
         
-        # Moments to find the center of the objectdetected 
+        # Moments to find the center of the object detection
         for c in conts:
             M = cv2.moments(c)
     
