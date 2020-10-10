@@ -42,7 +42,7 @@ kernelClose=np.ones((20,20))
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-mouse=Controller()
+mouse = Controller()
 
 root = tk.Tk()
 sx = root.winfo_screenwidth()
@@ -73,29 +73,30 @@ while True:
     cv2.drawContours(img, conts, -1, (255,0,0), 3)
 
     if conts:
+        # else:
+        mouse.release(Button.left)
+
+        # Wrap in a rectangle every object that get into the camera ROV
+        for obj in range(0, len(conts)):
+            x, y, w, h = cv2.boundingRect(conts[obj])
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+        x1, y1, w1, h1 = cv2.boundingRect(conts[0])
+        x1 = int(x1 + w1 / 2)
+        y1 = int(y1 + h1 / 2)
+
+        # Draws a center for the main image to track
+        cv2.circle(img, (x1, y1), 2, (0, 0, 255), 2)
+        mouseLoc = (sx - (x1 * sx / camx), y1 * sy / camy)
+        if (pinchFlag == 1):  # perform only if pinch is on
+            pinchFlag = 0  # setting pinch flag off
+
         if n_objects == 1:
             mouseLoc, pinchFlag = click(pinchFlag, conts)
 
-        else:
-            mouse.release(Button.left)
-            # Wrap in a rectangle every object that get into the camera ROV
-            for obj in range(0, len(conts)):
-                x, y, w, h = cv2.boundingRect(conts[obj])
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
-            x1, y1, w1, h1 = cv2.boundingRect(conts[0])
-            x1 = int(x1 + w1 / 2)
-            y1 = int(y1 + h1 / 2)
-
-            # Draws a center for the main image to track
-            cv2.circle(img, (x1, y1), 2, (0, 0, 255), 2)
-            mouseLoc = (sx - (x1 * sx / camx), y1 * sy / camy)
-            if (pinchFlag == 1):  # perform only if pinch is on
-                pinchFlag = 0  # setting pinch flag off
-
-
         # Compute mouse location
         mouse.position = mouseLoc
+
     else:
         mouse.release(Button.left)
 
