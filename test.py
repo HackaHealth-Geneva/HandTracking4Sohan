@@ -95,7 +95,6 @@ while True:
 
 
         # Compute mouse location
-        # mouseLoc = (sx - (x1 * sx / camx), y1 * sy / camy)
         mouse.position = mouseLoc
     else:
         mouse.release(Button.left)
