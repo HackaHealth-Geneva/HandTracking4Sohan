@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import tkinter as tk
+from pynput.mouse import Button, Controller
 
 lowerBound = np.array([29,86,6])
 upperBound = np.array([64, 255, 255])
@@ -9,6 +11,14 @@ kernelOpen=np.ones((5,5))
 kernelClose=np.ones((20,20))
 
 font = cv2.FONT_HERSHEY_SIMPLEX
+
+mouse=Controller()
+
+root = tk.Tk()
+sx = root.winfo_screenwidth()
+sy = root.winfo_screenheight()
+camx,camy = 340,220
+print(sx,sy)
 
 while True:
     ret, img=cam.read()
@@ -34,6 +44,10 @@ while True:
         x1=int(x1+w1/2)
         y1=int(y1+h1/2)
         cv2.circle(img, (x1,y1),2,(0,0,255),2)
+        mouseLoc = (sx - (x1 * sx / camx), y1 * sy / camy)
+        mouse.position = mouseLoc
+        # while mouse.position != mouseLoc:
+           # pass
 
 
     # cv2.imshow("maskClose",maskClose)
