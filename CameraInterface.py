@@ -6,6 +6,7 @@ import numpy as np
 import threading
 from pynput.mouse import Controller
 
+
 class CameraInterface:
     def __init__(self):
         self.lowerBound = np.array([29, 86, 6])
@@ -15,21 +16,24 @@ class CameraInterface:
 
         self.root = Tk()
         self.root.bind('<Escape>', lambda e: self.root.quit())
-        self.root.bind("a", lambda x: self.pauseLoop())
+        # self.root.bind("a", lambda x: self.pauseLoop())
 
         self.kernelOpen = np.ones((5, 5))
         self.kernelClose = np.ones((20, 20))
 
         self.font = cv2.FONT_HERSHEY_SIMPLEX
 
+        self.varMouse = IntVar()
+        self.varClick = IntVar()
+
         self.lmain = Label(self.root)
 
         self.red = Button(self.root, text="red", bg="red", command=self.detectRed)
         self.green = Button(self.root, text="green", command=self.detectGreen, bg="green")
         self.blue = Button(self.root, text="blue", command=self.detectBlue, bg="blue")
-        self.rgbContainer = Label(self.root, text="placeholder for?")
-        self.pauseButton = Button(self.root, text="pause", command=self.pauseLoop)
-        self.actionButton = Button(self.root, text="click", command=self.doAction)
+        # self.rgbContainer = Label(self.root, text="test")
+        self.mouseCheckbox = Checkbutton(self.root, text="control mouse?", variable=self.varMouse, command=self.mouseMovement)
+        self.clickCheckbox = Checkbutton(self.root, text="control with click?", variable=self.varClick, command=self.clickControl)
 
         # self.startCam = Button(self.root, text="start camera", command=self.startThread)
 
@@ -37,9 +41,10 @@ class CameraInterface:
         self.red.grid(row=1, column=0, sticky='nesw')
         self.green.grid(row=2, column=0, sticky='nesw')
         self.blue.grid(row=3, column=0, sticky='nesw')
-        self.rgbContainer.grid(row=1, column=1, rowspan=3, sticky='nesw')
-        self.pauseButton.grid(row=4, column=0, columnspan=3, rowspan=2, sticky='nesw')
-        self.actionButton.grid(row=6, column=0, columnspan=3, rowspan=3, sticky='nesw')
+        # self.rgbContainer.grid(row=1, column=1, rowspan=3, sticky='nesw')
+
+        self.mouseCheckbox.grid(row=1, column=1,  sticky='nesw')
+        self.clickCheckbox.grid(row=2, column=1,  sticky='nesw')
 
         # self.startCam.grid(row=4, column=0, columnspan=3)
 
@@ -51,7 +56,8 @@ class CameraInterface:
         self.camx = 340
         self.camy = 220
 
-        self.pauseMode = False
+        self.mouseOn = False
+        self.clickControlOn = False
 
     def detectRed(self):
         self.lowerBound = np.array([170, 120, 150])
@@ -72,16 +78,21 @@ class CameraInterface:
     def doAction(self):
         print("do action")
 
-    def pauseLoop(self):
-
-        if self.pauseMode is False:
-            print('paused')
-            self.pauseMode = True
+    def mouseMovement(self):
+        if self.varMouse.get():
+            print("mouseOn")
+            self.mouseOn = True
         else:
-            print('started again')
-            self.pauseMode = False
-            self.show_frame()
+            print("mouseOff")
+            self.mouseOn = False
 
+    def clickControl(self):
+        if self.varClick.get():
+            print("click control on")
+            self.clickControlOn = True
+        else:
+            print("click control off")
+            self.clickControlOn = False
 
     def nothing(self):
         pass
@@ -115,39 +126,40 @@ class CameraInterface:
         img = cv2.flip(img, 1)
         img = cv2.resize(img, (self.camx, self.camy))
 
-        if not self.pauseMode:
-            # convert BGR to HSV
-            frame = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-            imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-            # create the Mask
-            mask = cv2.inRange(imgHSV, self.lowerBound, self.upperBound)
-            # morphology
-            maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernelOpen)
-            maskClose = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, self.kernelClose)
+        # convert BGR to HSV
+        frame = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        # create the Mask
+        mask = cv2.inRange(imgHSV, self.lowerBound, self.upperBound)
+        # morphology
+        maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernelOpen)
+        maskClose = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, self.kernelClose)
 
-            maskFinal = maskClose
-            conts, h = cv2.findContours(maskFinal.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        maskFinal = maskClose
+        conts, h = cv2.findContours(maskFinal.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-            cv2.drawContours(img, conts, -1, (255, 0, 0), 3)
+        cv2.drawContours(img, conts, -1, (255, 0, 0), 3)
 
-            if conts:
-                x, y, w, h = cv2.boundingRect(conts[0])
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-                x1, y1, w1, h1 = cv2.boundingRect(conts[0])
-                x1 = int(x1 + w1 / 2)
-                y1 = int(y1 + h1 / 2)
-                cv2.circle(img, (x1, y1), 2, (0, 0, 255), 2)
+        if conts:
+            x, y, w, h = cv2.boundingRect(conts[0])
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            x1, y1, w1, h1 = cv2.boundingRect(conts[0])
+            x1 = int(x1 + w1 / 2)
+            y1 = int(y1 + h1 / 2)
+            cv2.circle(img, (x1, y1), 2, (0, 0, 255), 2)
+
+            if self.mouseOn:
                 mouseLoc = (self.screenx - (x1 * self.screenx / self.camx), y1 * self.screeny / self.camy)
                 self.mouse.position = mouseLoc
 
+            if self.clickControlOn:
+                print("click control on")
 
-            imgPIL = PIL.Image.fromarray(frame)
-            imgtk = ImageTk.PhotoImage(image=imgPIL)
-            self.lmain.imgtk = imgtk
-            self.lmain.configure(image=imgtk)
-            self.lmain.after(10, self.show_frame)
-
-
+        imgPIL = PIL.Image.fromarray(frame)
+        imgtk = ImageTk.PhotoImage(image=imgPIL)
+        self.lmain.imgtk = imgtk
+        self.lmain.configure(image=imgtk)
+        self.lmain.after(10, self.show_frame)
 
 
 if __name__ == "__main__":
