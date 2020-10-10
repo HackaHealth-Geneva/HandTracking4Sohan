@@ -5,7 +5,7 @@ from tkinter import *
 import numpy as np
 import threading
 from pynput.mouse import Controller
-
+from pynput.mouse import Button as mButton
 
 class CameraInterface:
     def __init__(self):
@@ -13,6 +13,7 @@ class CameraInterface:
         self.upperBound = np.array([64, 255, 255])
 
         self.cam = cv2.VideoCapture(0)
+        ret, self.img = self.cam.read()
 
         self.root = Tk()
         self.root.bind('<Escape>', lambda e: self.root.quit())
@@ -58,6 +59,8 @@ class CameraInterface:
 
         self.mouseOn = False
         self.clickControlOn = False
+
+        self.pinchFlag = True
 
     def detectRed(self):
         self.lowerBound = np.array([170, 120, 150])
@@ -117,18 +120,44 @@ class CameraInterface:
         cv2.createTrackbar(vl, "color_hsv", self.lowerBound[2], 255, self.nothing)
         cv2.createTrackbar(thv, "color_hsv", 127, 255, self.nothing)
 
+    def click(self, pinchFlag, conts):
+        '''
+        Performs a click based on the pinchFlag and use the image´s countours
+        to define a new rectangle
+        Args:
+            pinchFlag Flag to controls the clicks
+            conts Countours of the image
+        Returns:
+            mouseLoc Mouse coordinates location
+            pinchFlag Flag to controls the clicks
+        '''
+        print("click!")
+        x, y, w, h = cv2.boundingRect(conts[0])
+        # drawing the rectangle
+        cv2.rectangle(self.img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        cx = int(x + w / 2)
+        cy = int(y + h / 2)
+        cv2.circle(self.img, (cx, cy), int((w + h) / 4), (0, 0, 255), 2)
+
+        if not pinchFlag:  # perform only if pinch is off
+            pinchFlag = True  # setting pinch flag on
+            self.mouse.press(mButton.left)
+
+        mouseLoc = (self.screenx - (cx * self.screenx / self.camx), cy * self.screeny / self.camy)
+        return mouseLoc, pinchFlag
+
     def show_frame(self):
 
-        ret, img = self.cam.read()
+        ret, self.img = self.cam.read()
 
         # flipping for the selfie cam right now to keep sane
 
-        img = cv2.flip(img, 1)
-        img = cv2.resize(img, (self.camx, self.camy))
+        self.img = cv2.flip(self.img, 1)
+        self.img = cv2.resize(self.img, (self.camx, self.camy))
 
         # convert BGR to HSV
-        frame = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        frame = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
+        imgHSV = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
         # create the Mask
         mask = cv2.inRange(imgHSV, self.lowerBound, self.upperBound)
         # morphology
@@ -138,7 +167,9 @@ class CameraInterface:
         maskFinal = maskClose
         conts, h = cv2.findContours(maskFinal.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-        cv2.drawContours(img, conts, -1, (255, 0, 0), 3)
+        n_objects = len(conts)
+
+        cv2.drawContours(frame, conts, -1, (255, 0, 0), 3)
 
         if conts:
             x, y, w, h = cv2.boundingRect(conts[0])
@@ -146,12 +177,27 @@ class CameraInterface:
             x1, y1, w1, h1 = cv2.boundingRect(conts[0])
             x1 = int(x1 + w1 / 2)
             y1 = int(y1 + h1 / 2)
-            cv2.circle(img, (x1, y1), 2, (0, 0, 255), 2)
+            cv2.circle(frame, (x1, y1), 2, (0, 0, 255), 2)
 
             if self.mouseOn:
+
+                if (self.pinchFlag):  # perform only if pinch is on
+                    self.pinchFlag = False
+                    self.mouse.release(mButton.left)
+
+                # Compute mouse location
                 mouseLoc = (self.screenx - (x1 * self.screenx / self.camx), y1 * self.screeny / self.camy)
+                # mouse.position = mouseLoc
+
+                # If there is only one object, it means both finger
+                # (objects) collided so a click take place
+                if n_objects == 1:
+                    print("click")
+                    mouseLoc, pinchFlag = self.click(self.pinchFlag, conts)
+
                 self.mouse.position = mouseLoc
 
+            # TO BE IMPLEMENTED
             if self.clickControlOn:
                 print("click control on")
 
