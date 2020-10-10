@@ -5,7 +5,6 @@ from tkinter import *
 import numpy as np
 import threading
 from pynput.mouse import Controller
-from time import sleep
 
 class CameraInterface:
     def __init__(self):
@@ -25,11 +24,12 @@ class CameraInterface:
 
         self.lmain = Label(self.root)
 
-        self.red = Button(self.root, text="red", command=self.detectRed)
-        self.green = Button(self.root, text="green", command=self.detectGreen)
-        self.blue = Button(self.root, text="blue", command=self.detectBlue)
-        self.rgbContainer = Label(self.root, text="test")
+        self.red = Button(self.root, text="red", bg="red", command=self.detectRed)
+        self.green = Button(self.root, text="green", command=self.detectGreen, bg="green")
+        self.blue = Button(self.root, text="blue", command=self.detectBlue, bg="blue")
+        self.rgbContainer = Label(self.root, text="placeholder for?")
         self.pauseButton = Button(self.root, text="pause", command=self.pauseLoop)
+        self.actionButton = Button(self.root, text="click", command=self.doAction)
 
         # self.startCam = Button(self.root, text="start camera", command=self.startThread)
 
@@ -39,6 +39,7 @@ class CameraInterface:
         self.blue.grid(row=3, column=0, sticky='nesw')
         self.rgbContainer.grid(row=1, column=1, rowspan=3, sticky='nesw')
         self.pauseButton.grid(row=4, column=0, columnspan=3, rowspan=2, sticky='nesw')
+        self.actionButton.grid(row=6, column=0, columnspan=3, rowspan=3, sticky='nesw')
 
         # self.startCam.grid(row=4, column=0, columnspan=3)
 
@@ -62,11 +63,14 @@ class CameraInterface:
 
     def detectBlue(self):
         self.lowerBound = np.array([110, 150, 100])
-        self.upperBound = np.array([120, 200, 200])
+        self.upperBound = np.array([120, 255, 255])
 
     def startThread(self):
         threadCam = threading.Thread(target=self.show_frame)
         threadCam.start()
+
+    def doAction(self):
+        print("do action")
 
     def pauseLoop(self):
 
