@@ -29,6 +29,7 @@ class CameraInterface:
         self.green = Button(self.root, text="green", command=self.detectGreen)
         self.blue = Button(self.root, text="blue", command=self.detectBlue)
         self.rgbContainer = Label(self.root, text="test")
+        self.pauseButton = Button(self.root, text="pause", command=self.pauseLoop)
 
         # self.startCam = Button(self.root, text="start camera", command=self.startThread)
 
@@ -37,6 +38,8 @@ class CameraInterface:
         self.green.grid(row=2, column=0, sticky='nesw')
         self.blue.grid(row=3, column=0, sticky='nesw')
         self.rgbContainer.grid(row=1, column=1, rowspan=3, sticky='nesw')
+        self.pauseButton.grid(row=4, column=0, columnspan=3, rowspan=2, sticky='nesw')
+
         # self.startCam.grid(row=4, column=0, columnspan=3)
 
         self.mouse = Controller()
@@ -58,7 +61,7 @@ class CameraInterface:
         self.upperBound = np.array([64, 255, 255])
 
     def detectBlue(self):
-        lowerBound = np.array([110, 150, 100])
+        self.lowerBound = np.array([110, 150, 100])
         self.upperBound = np.array([120, 200, 200])
 
     def startThread(self):
