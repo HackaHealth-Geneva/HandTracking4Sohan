@@ -79,6 +79,29 @@ class CameraInterface:
             self.show_frame()
 
 
+    def nothing(self):
+        pass
+
+    def create_trackbar(self):
+
+        # set trackbar
+        hh = 'hue high'
+        hl = 'hue low'
+        sh = 'saturation high'
+        sl = 'saturation low'
+        vh = 'value high'
+        vl = 'value low'
+        thv = 'th1'
+
+        # set ranges
+        cv2.createTrackbar(hh, "color_hsv", self.upperBound[0], 179, self.nothing)
+        cv2.createTrackbar(hl, "color_hsv", self.lowerBound[0], 179, self.nothing)
+        cv2.createTrackbar(sh, "color_hsv", self.upperBound[1], 255, self.nothing)
+        cv2.createTrackbar(sl, "color_hsv", self.lowerBound[1], 255, self.nothing)
+        cv2.createTrackbar(vh, "color_hsv", self.upperBound[2], 255, self.nothing)
+        cv2.createTrackbar(vl, "color_hsv", self.lowerBound[2], 255, self.nothing)
+        cv2.createTrackbar(thv, "color_hsv", 127, 255, self.nothing)
+
     def show_frame(self):
 
         ret, img = self.cam.read()
@@ -90,6 +113,7 @@ class CameraInterface:
 
         if not self.pauseMode:
             # convert BGR to HSV
+            frame = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
             # create the Mask
             mask = cv2.inRange(imgHSV, self.lowerBound, self.upperBound)
@@ -104,7 +128,7 @@ class CameraInterface:
 
             if conts:
                 x, y, w, h = cv2.boundingRect(conts[0])
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
                 x1, y1, w1, h1 = cv2.boundingRect(conts[0])
                 x1 = int(x1 + w1 / 2)
                 y1 = int(y1 + h1 / 2)
@@ -113,7 +137,7 @@ class CameraInterface:
                 self.mouse.position = mouseLoc
 
 
-            imgPIL = PIL.Image.fromarray(img)
+            imgPIL = PIL.Image.fromarray(frame)
             imgtk = ImageTk.PhotoImage(image=imgPIL)
             self.lmain.imgtk = imgtk
             self.lmain.configure(image=imgtk)
