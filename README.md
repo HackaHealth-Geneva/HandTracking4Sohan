@@ -18,3 +18,4 @@ To be able to communicate, these technological devices require a high motor effo
 - Launch the grid software and ```test.py```
 - Focus on python interface
 - Press ```a``` on keyboard to trigger right clic
+- Then we are able to control the pointer with hand tracking. 
