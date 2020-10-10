@@ -15,3 +15,6 @@ To be able to communicate, these technological devices require a high motor effo
  - ```Notes _ Ideas.docx``` : Ideas, notes and ressources for the challenge. 
  
  ## Launch
+- Launch the grid software and ```test.py```
+- Focus on python interface
+- Press ```a``` on keyboard to trigger right clic
