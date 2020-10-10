@@ -1,4 +1,7 @@
+python >= 3.0.0
+opencv-python >= 2.0.0
 pynput
 Pillow
 numpy
-opencv-python
+pyqt
+
