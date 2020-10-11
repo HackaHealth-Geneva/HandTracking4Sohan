@@ -1,4 +1,4 @@
-# HandTracking4Sohan
+# HandTracking4Sohan <img src="index.png" align="right" alt="drawing" width="250"/>
 
 ## Challenges 
 
