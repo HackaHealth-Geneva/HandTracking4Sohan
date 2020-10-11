@@ -26,7 +26,8 @@ def KeyboardController():
         if c==54:
             keyboard.press(Key.enter)
         if c==57:
-             break; #leave  KeyboardController
+            keyboard.press("s")
+             # break; #leave  KeyboardController
       
       
     

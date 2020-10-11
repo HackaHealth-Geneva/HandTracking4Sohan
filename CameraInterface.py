@@ -6,11 +6,19 @@ import numpy as np
 import threading
 from pynput.mouse import Controller
 from pynput.mouse import Button as mButton
+
 from tt import KeyboardController
 
 import serial
 import keyboard
 from pynput.keyboard import Key,KeyCode, Controller
+
+import mouse
+import os
+import time
+import os.path
+from os import path
+
 
 class CameraInterface:
     def __init__(self):
@@ -22,6 +30,7 @@ class CameraInterface:
 
         self.root = Tk()
         self.root.bind('<Escape>', lambda e: self.root.quit())
+        self.root.bind('s', lambda e: self.selected())
         # self.root.bind("a", lambda x: self.pauseLoop())
 
         self.kernelOpen = np.ones((5, 5))
@@ -38,8 +47,10 @@ class CameraInterface:
         self.green = Button(self.root, text="green", command=self.detectGreen, bg="green")
         self.blue = Button(self.root, text="blue", command=self.detectBlue, bg="blue")
         # self.rgbContainer = Label(self.root, text="test")
-        self.mouseCheckbox = Checkbutton(self.root, text="control mouse?", variable=self.varMouse, command=self.mouseMovement)
-        self.clickCheckbox = Checkbutton(self.root, text="control with click?", variable=self.varClick, command=self.clickControl)
+        self.mouseCheckbox = Checkbutton(self.root, text="control with mouse?", variable=self.varMouse, command=self.mouseMovement)
+        # self.clickCheckbox = Checkbutton(self.root, text="control with click?", variable=self.varClick, command=self.clickControl)
+        self.gameButton = Button(self.root, text="Launch game", command=self.launchGame, bg="violet")
+
 
         # self.startCam = Button(self.root, text="start camera", command=self.startThread)
 
@@ -49,9 +60,10 @@ class CameraInterface:
         self.blue.grid(row=3, column=0, sticky='nesw')
         # self.rgbContainer.grid(row=1, column=1, rowspan=3, sticky='nesw')
 
-        self.mouseCheckbox.grid(row=1, column=1,  sticky='nesw')
-        self.clickCheckbox.grid(row=2, column=1,  sticky='nesw')
 
+        self.mouseCheckbox.grid(row=1, column=1,  sticky='nesw')
+        # self.clickCheckbox.grid(row=2, column=1,  sticky='nesw')
+        self.gameButton.grid(row=4, column=0, columnspan=3, sticky='nesw')
         # self.startCam.grid(row=4, column=0, columnspan=3)
 
         self.mouse = Controller()
@@ -65,20 +77,22 @@ class CameraInterface:
         self.mouseOn = False
         self.clickControlOn = False
 
-        self.pinchFlag = True
-        
-        ##### tt code #####
-        keyboard = Controller()
-    
-        #listen to the buttons
-        ard = serial.Serial(port ="COM4", baudrate ="9600");
-        button = ard.readline()
-        print(button)
-        print("hello")
-        if button ==57:
-            KeyboardController()
-            
+# <<<<<<< HEAD
+#         self.pinchFlag = True
+#
+#
+#
+# =======
+#         self.pinchFlag = False
+# >>>>>>> origin/main
 
+
+    def launchGame(self):
+        try: 
+            os.startfile('C:\\Users\\GPUser\\Documents\\HandTracking4Sohan-main\\build4demo\\build4demo\\Sohan_project.exe')
+        except:
+                print('Cannot launch game')
+        
     def detectRed(self):
         self.lowerBound = np.array([170, 120, 150])
         self.upperBound = np.array([190, 255, 255])
@@ -106,6 +120,12 @@ class CameraInterface:
             print("mouseOff")
             self.mouseOn = False
 
+    def selected(self):
+        if self.varMouse.get():
+            self.mouseCheckbox.deselect()
+        else:
+            self.mouseCheckbox.select()
+
     def clickControl(self):
         if self.varClick.get():
             print("click control on")
@@ -114,28 +134,18 @@ class CameraInterface:
             print("click control off")
             self.clickControlOn = False
 
-    def nothing(self):
-        pass
+    def detectKey57(self):
+        print("detect Key 57")
+        #### tt code #####
+        keyboard = Controller()
 
-    def create_trackbar(self):
-
-        # set trackbar
-        hh = 'hue high'
-        hl = 'hue low'
-        sh = 'saturation high'
-        sl = 'saturation low'
-        vh = 'value high'
-        vl = 'value low'
-        thv = 'th1'
-
-        # set ranges
-        cv2.createTrackbar(hh, "color_hsv", self.upperBound[0], 179, self.nothing)
-        cv2.createTrackbar(hl, "color_hsv", self.lowerBound[0], 179, self.nothing)
-        cv2.createTrackbar(sh, "color_hsv", self.upperBound[1], 255, self.nothing)
-        cv2.createTrackbar(sl, "color_hsv", self.lowerBound[1], 255, self.nothing)
-        cv2.createTrackbar(vh, "color_hsv", self.upperBound[2], 255, self.nothing)
-        cv2.createTrackbar(vl, "color_hsv", self.lowerBound[2], 255, self.nothing)
-        cv2.createTrackbar(thv, "color_hsv", 127, 255, self.nothing)
+        #listen to the buttons
+        ard = serial.Serial(port ="COM4", baudrate ="9600");
+        button = ard.readline()
+        print(button)
+        print("hello")
+        if button ==57:
+                KeyboardController()
 
     def click(self, pinchFlag, conts):
         '''
@@ -158,7 +168,8 @@ class CameraInterface:
 
         if not pinchFlag:  # perform only if pinch is off
             pinchFlag = True  # setting pinch flag on
-            self.mouse.press(mButton.left)
+            mouse.click()
+            # self.mouse.press(mButton.left)
 
         mouseLoc = (self.screenx - (cx * self.screenx / self.camx), cy * self.screeny / self.camy)
         return mouseLoc, pinchFlag
@@ -169,7 +180,7 @@ class CameraInterface:
 
         # flipping for the selfie cam right now to keep sane
 
-        self.img = cv2.flip(self.img, 1)
+        # self.img = cv2.flip(self.img, 1)
         self.img = cv2.resize(self.img, (self.camx, self.camy))
 
         # convert BGR to HSV
@@ -200,18 +211,23 @@ class CameraInterface:
 
                 if (self.pinchFlag):  # perform only if pinch is on
                     self.pinchFlag = False
-                    self.mouse.release(mButton.left)
+                    # self.mouse.release(mButton.left)
+                    mouse.release()
 
                 # Compute mouse location
                 mouseLoc = (self.screenx - (x1 * self.screenx / self.camx), y1 * self.screeny / self.camy)
+                x = self.screenx - (x1 * self.screenx / self.camx)
+                y = y1 * self.screeny / self.camy
+                
+                mouse.move(mouseLoc[0], mouseLoc[1])
                 # mouse.position = mouseLoc
 
                 # If there is only one object, it means both finger
                 # (objects) collided so a click take place
-                if n_objects == 1:
-                    print("click")
-                    mouseLoc, pinchFlag = self.click(self.pinchFlag, conts)
-
+                #if n_objects == 1:
+                #    print("click")
+                #    mouseLoc, pinchFlag = self.click(self.pinchFlag, conts)
+                #
                 self.mouse.position = mouseLoc
 
             # TO BE IMPLEMENTED
@@ -222,7 +238,7 @@ class CameraInterface:
         imgtk = ImageTk.PhotoImage(image=imgPIL)
         self.lmain.imgtk = imgtk
         self.lmain.configure(image=imgtk)
-        self.lmain.after(10, self.show_frame)
+        self.lmain.after(20, self.show_frame)
 
 
 if __name__ == "__main__":
