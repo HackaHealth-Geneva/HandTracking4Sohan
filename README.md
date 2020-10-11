@@ -19,6 +19,8 @@ As the best way he has to communicate is through pictograms he points with the t
 - ```test_trackerbar.py``` : Segmentation code with HSV trackerbar to select specific colors. 
 - ```CameraInterface.py``` : Creates an command interface to select red, blue and green shapes seen by the webcam. Also creates two checkboxes ```Mouse``` to allow pointer control with the webcam and ```Clic``` to allow the user to use the webcam with two green markers on the fingers and actually clic on the computer by pulling the two fingers closer together. 
 
+![]()
+
 #### Capacitive touche sensor
 - ```touch_detection.py```: Using capacitive sensors placed on a board, Sohan can slide his hand on the board and touchone of the capacitive sensors for some time to activate directonal keybord buttons and navigate through his computer interface. 
  
@@ -32,7 +34,7 @@ As the best way he has to communicate is through pictograms he points with the t
 
 #### Demo
 
-![Alt text](ezgif-6-e0b59fa19506.gif)
+![Mouse control](Mouse_HandTracker.gif) ![Grip3 pointer selection](Grip3_handtracker.gif)
 
 ## Further improvements
 ...
