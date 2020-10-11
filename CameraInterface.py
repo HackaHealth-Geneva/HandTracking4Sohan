@@ -6,6 +6,7 @@ import numpy as np
 import threading
 from pynput.mouse import Controller
 from pynput.mouse import Button as mButton
+from tt import KeyboardController
 
 class CameraInterface:
     def __init__(self):
@@ -213,3 +214,6 @@ if __name__ == "__main__":
     camInt = CameraInterface()
     camInt.show_frame()
     camInt.root.mainloop()
+    
+    if True:
+        KeyboardController()
