@@ -8,6 +8,10 @@ from pynput.mouse import Controller
 from pynput.mouse import Button as mButton
 from tt import KeyboardController
 
+import serial
+import keyboard
+from pynput.keyboard import Key,KeyCode, Controller
+
 class CameraInterface:
     def __init__(self):
         self.lowerBound = np.array([29, 86, 6])
@@ -62,6 +66,18 @@ class CameraInterface:
         self.clickControlOn = False
 
         self.pinchFlag = True
+        
+        ##### tt code #####
+        keyboard = Controller()
+    
+        #listen to the buttons
+        ard = serial.Serial(port ="COM4", baudrate ="9600");
+        button = ard.readline()
+        print(button)
+        print("hello")
+        if button ==57:
+            KeyboardController()
+            
 
     def detectRed(self):
         self.lowerBound = np.array([170, 120, 150])
@@ -213,7 +229,17 @@ if __name__ == "__main__":
 
     camInt = CameraInterface()
     camInt.show_frame()
-    camInt.root.mainloop()
+   
+    """
     
-    if True:
+    keyboard = Controller()
+    
+    #listen to the buttons
+    ard = serial.Serial(port ="COM4", baudrate ="9600");
+    button = ard.readline()
+    print(button)
+    print("hello")
+    if button ==57:
         KeyboardController()
+    """  
+    camInt.root.mainloop()

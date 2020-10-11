@@ -1,16 +1,16 @@
 
+import time
 import serial
-import keyboard
 from pynput.keyboard import Key,KeyCode, Controller
 
+c = 0
+keyboard = Controller()
 
-def KeyboardController():
-    c = 0
-    keyboard = Controller()
+ard = serial.Serial(port ="COM4", baudrate ="9600");
 
-    ard = serial.Serial(port ="COM4", baudrate ="9600");
 
-    while(True):
+while(True):
+
         data = ard.readline()
         c = data[0]
         print(c)
@@ -27,6 +27,9 @@ def KeyboardController():
             keyboard.press(Key.enter)
         if c==57:
              break; #leave  KeyboardController
+        
+
+
       
       
     
