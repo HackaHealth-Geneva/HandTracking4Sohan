@@ -152,7 +152,7 @@ class CameraInterface:
 
         # flipping for the selfie cam right now to keep sane
 
-        self.img = cv2.flip(self.img, 1)
+        # self.img = cv2.flip(self.img, 1)
         self.img = cv2.resize(self.img, (self.camx, self.camy))
 
         # convert BGR to HSV
