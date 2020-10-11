@@ -31,3 +31,6 @@ As the best way he has to communicate is through pictograms he points with the t
 #### Demo
 
 ![Alt text](ezgif-6-e0b59fa19506.gif)
+
+## Further improvements
+...
