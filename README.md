@@ -20,10 +20,10 @@ As the best way he has to communicate is through pictograms he points with the t
 - ```CameraInterface.py``` : Creates an command interface to select red, blue and green shapes seen by the webcam. Also creates two checkboxes ```Mouse``` to allow pointer control with the webcam and ```Clic``` to allow the user to use the webcam with two green markers on the fingers and actually clic on the computer by pulling the two fingers closer together. 
 
 <img src="OpenCV.png" alt="drawing" width="600"/>
-On the different files we can see the masks generated as pixels labelled with 1. 
+On the different windows we can see the masks generated as pixels labelled with 1. One is the opened version of the shape, another one is the closed shape and the difference of the two gives the contour of the original shape. 
 
 #### Capacitive touche sensor
-- ```touch_detection.py```: Using capacitive sensors placed on a board, Sohan can slide his hand on the board and touchone of the capacitive sensors for some time to activate directonal keybord buttons and navigate through his computer interface. One is the opened version of the shape, another one is the closed shape and the difference of the two gives the contour of the original shape. 
+- ```touch_detection.py```: Using capacitive sensors placed on a board, Sohan can slide his hand on the board and touchone of the capacitive sensors for some time to activate directonal keybord buttons and navigate through his computer interface. 
  
  ## Launch
  
