@@ -30,7 +30,6 @@ class CameraInterface:
 
         self.root = Tk()
         self.root.bind('<Escape>', lambda e: self.root.quit())
-        self.root.bind('s', lambda e: self.selected())
         # self.root.bind("a", lambda x: self.pauseLoop())
 
         self.kernelOpen = np.ones((5, 5))
@@ -77,14 +76,10 @@ class CameraInterface:
         self.mouseOn = False
         self.clickControlOn = False
 
-# <<<<<<< HEAD
-#         self.pinchFlag = True
-#
-#
-#
-# =======
-#         self.pinchFlag = False
-# >>>>>>> origin/main
+        self.ard = serial.Serial(port ="COM4", baudrate ="9600");
+
+        self.pinchFlag = False
+
 
 
     def launchGame(self):
@@ -134,18 +129,6 @@ class CameraInterface:
             print("click control off")
             self.clickControlOn = False
 
-    def detectKey57(self):
-        print("detect Key 57")
-        #### tt code #####
-        keyboard = Controller()
-
-        #listen to the buttons
-        ard = serial.Serial(port ="COM4", baudrate ="9600");
-        button = ard.readline()
-        print(button)
-        print("hello")
-        if button ==57:
-                KeyboardController()
 
     def click(self, pinchFlag, conts):
         '''
@@ -175,6 +158,10 @@ class CameraInterface:
         return mouseLoc, pinchFlag
 
     def show_frame(self):
+        # read from port
+        data = self.ard.readline()
+        if data[0] is 57:
+            self.selected()
 
         ret, self.img = self.cam.read()
 
@@ -245,17 +232,4 @@ if __name__ == "__main__":
 
     camInt = CameraInterface()
     camInt.show_frame()
-   
-    """
-    
-    keyboard = Controller()
-    
-    #listen to the buttons
-    ard = serial.Serial(port ="COM4", baudrate ="9600");
-    button = ard.readline()
-    print(button)
-    print("hello")
-    if button ==57:
-        KeyboardController()
-    """  
     camInt.root.mainloop()
