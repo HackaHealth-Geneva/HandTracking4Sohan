@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 import tkinter as tk
 #from pynput.mouse import Button, Controller
-import win32api
-import pyautogui
+# import win32api
+# import pyautogui
 import mouse
 import time 
 from time import sleep
