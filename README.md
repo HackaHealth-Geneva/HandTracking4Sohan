@@ -19,7 +19,7 @@ As the best way he has to communicate is through pictograms he points with the t
 - ```test_trackerbar.py``` : Segmentation code with HSV trackerbar to select specific colors. 
 - ```CameraInterface.py``` : Creates an command interface to select red, blue and green shapes seen by the webcam. Also creates two checkboxes ```Mouse``` to allow pointer control with the webcam and ```Clic``` to allow the user to use the webcam with two green markers on the fingers and actually clic on the computer by pulling the two fingers closer together. 
 
-<img src="OpenCV.png" alt="drawing" width="600"/>
+<p align="center"><img src="OpenCV.png" alt="drawing" width="600"/><p>
 On the different windows we can see the masks generated as pixels labelled with 1. One is the opened version of the shape, another one is the closed shape and the difference of the two gives the contour of the original shape. 
 
 #### Capacitive touche sensor
@@ -34,8 +34,8 @@ On the different windows we can see the masks generated as pixels labelled with 
 - Now we should be are able to control the pointer with hand tracking. 
 
 #### Demo
-
-![Mouse control](Mouse_HandTracker.gif) ![Grip3 pointer selection](Grip3_handtracker.gif)
+##### Hand Tracking & Control of Grid Interface
+<p align="center"><img src="Mouse_HandTracker.gif" width="450" height="250"/><img src="Grip3_handtracker.gif" width="150" height="250"/><p align="center">
 
 ## Further improvements
 ...
