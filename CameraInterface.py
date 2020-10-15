@@ -1,94 +1,164 @@
-import PIL
-from PIL import Image,ImageTk
-import cv2
-from tkinter import *
-import numpy as np
-import threading
-from pynput.mouse import Controller
-from pynput.mouse import Button as mButton
-
-# from tt import KeyboardController
-
-import serial
-# import keyboard
-from pynput.keyboard import Key,KeyCode, Controller
-
 import mouse
 import os
 import time
-import os.path
+import PIL
+import cv2
+import numpy as np
+import threading
+import configparser
+
+import ast
+import warnings
+import serial
+import serial.tools.list_ports
+
+
+
+from PIL import Image,ImageTk
+from tkinter import *
+
 from os import path
+from pynput.keyboard import Key,KeyCode, Controller
+from pynput.mouse import Controller
+from pynput.mouse import Button as mButton
+
+# import unrar
+# from unrar import rarfile
+# from tt import KeyboardController
 
 
 class CameraInterface:
-    def __init__(self):
-        self.lowerBound = np.array([29, 86, 6])
-        self.upperBound = np.array([64, 255, 255])
+    def __init__(self,config_file):
 
-        self.cam = cv2.VideoCapture(0)
-        ret, self.img = self.cam.read()
+        # READ CONFIG FILE
+        self.config_file = config_file
+        self.config = configparser.ConfigParser()
+        self.config.read(self.config_file)
+        
+        # self.lowerBound = np.array([29, 86, 6])
+        # self.upperBound = np.array([64, 255, 255])
 
+        self.lowerBound = np.array([53, 74, 160])
+        self.upperBound = np.array([90, 147, 255])#h:53-90 s:74-147 v: 160-255
         self.root = Tk()
         self.root.bind('<Escape>', lambda e: self.root.quit())
-        # self.root.bind("a", lambda x: self.pauseLoop())
+        self.root.title('HandTracking4Sohan')
+        self.root.configure(background="gray77")
+        self.root.resizable(1,1)
 
-        self.kernelOpen = np.ones((5, 5))
-        self.kernelClose = np.ones((20, 20))
+        path_icon = os.path.join(r'.\Icon','HackaHealth_Logo_tkinter.ico')
+        self.root.wm_iconbitmap(path_icon)
+
+        # Config file
+        # Window params
+        self.cam_x = self.config.getint("window","camx")
+        self.cam_y = self.config.getint("window","camy")
+        self.refresh_rate = self.config.getint("window","refresh_rate")
+        
+        # Tracking params
+        self.use_cam = self.config.getboolean("tracking_params","use_cam")
+        kernel_o = self.config.getint("tracking_params","kernel_o")
+        kernel_c = self.config.getint("tracking_params","kernel_c")
+        cam_id = self.config.getint("camera","cam_id")
+
+        self.kernelOpen = np.ones((kernel_o, kernel_o))
+        self.kernelClose = np.ones((kernel_c, kernel_c))
+        self.cam = cv2.VideoCapture(cam_id)
+        # ret, self.img = self.cam.read()
+
+        # Game params
+        self.path_game = ast.literal_eval(self.config.get("game", "path_game")) 
+        # if not os.path.exists(self.path_game):
+        #     print("Unzipping the game")
+        #     # specifying the zip file name 
+        #     file_name = "buildfordemo2"
+        #     rar = rarfile.RarFile(file_name)
+        #     print(rar.namelist())
+
+        #     rar.extractall()
+        #     print('Extracting all the files now...') 
+        #     print('Done!') 
 
         self.font = cv2.FONT_HERSHEY_SIMPLEX
-
+        
+        # Mouse Controller
         self.varMouse = IntVar()
         self.varClick = IntVar()
+        self.mouse = Controller()
 
+        # Capacitive sensor
+        self.coord_x = 120
+        self.coord_y = 60
+        self.circle_radius = 10
+        self.circle_color_arrow = (255, 0, 0)
+        self.circle_color_switch = (0, 0, 255)
+        self.circle_color_touch = (0, 255, 0)
+        self.circle_thickness = -5
+
+        # Interface 
         self.lmain = Label(self.root)
 
-        self.red = Button(self.root, text="red", bg="red", command=self.detectRed)
-        self.green = Button(self.root, text="green", command=self.detectGreen, bg="green")
-        self.blue = Button(self.root, text="blue", command=self.detectBlue, bg="blue")
-        # self.rgbContainer = Label(self.root, text="test")
-        self.mouseCheckbox = Checkbutton(self.root, text="control with mouse?", variable=self.varMouse, command=self.mouseMovement)
-        # self.clickCheckbox = Checkbutton(self.root, text="control with click?", variable=self.varClick, command=self.clickControl)
-        self.gameButton = Button(self.root, text="Launch game", command=self.launchGame, bg="violet")
 
+        self.red = Button(self.root, text="red", command=self.detectRed,state='disabled',bg='gray72')
+        self.green = Button(self.root, text="green", command=self.detectGreen,state='disabled',bg='gray72')
+        self.blue = Button(self.root, text="blue", command=self.detectBlue,state='disabled',bg='gray72')
+        # self.rgbContainer = Label(self.root, text="test")
+        self.mouseCheckbox = Checkbutton(self.root, text="Mouse Controller On/Off", variable=self.varMouse, command=self.mouseMovement,background="gray77")
+        # self.clickCheckbox = Checkbutton(self.root, text="control with click?", variable=self.varClick, command=self.clickControl)
+        self.gameButton = Button(self.root, text="Game Training", command=self.launchGame, bg="violet")
 
         # self.startCam = Button(self.root, text="start camera", command=self.startThread)
 
         self.lmain.grid(row=0, column=0, columnspan=2)
-        self.red.grid(row=1, column=0, sticky='nesw')
-        self.green.grid(row=2, column=0, sticky='nesw')
-        self.blue.grid(row=3, column=0, sticky='nesw')
+        self.red.grid(row=1, column=0, sticky='nesw',pady=1)
+        self.green.grid(row=2, column=0, sticky='nesw',pady=1)
+        self.blue.grid(row=3, column=0, sticky='nesw',pady=1)
         # self.rgbContainer.grid(row=1, column=1, rowspan=3, sticky='nesw')
 
 
         self.mouseCheckbox.grid(row=1, column=1,  sticky='nesw')
         # self.clickCheckbox.grid(row=2, column=1,  sticky='nesw')
-        self.gameButton.grid(row=4, column=0, columnspan=3, sticky='nesw')
+        self.gameButton.grid(row=4, column=0, columnspan=2, sticky='nesw')
         # self.startCam.grid(row=4, column=0, columnspan=3)
 
-        self.mouse = Controller()
+        self.screen_x = self.root.winfo_screenwidth()
+        self.screen_y = self.root.winfo_screenheight()
 
-        self.screenx = self.root.winfo_screenwidth()
-        self.screeny = self.root.winfo_screenheight()
-
-        self.camx = 340
-        self.camy = 220
-
+        # Initilization params
         self.mouseOn = False
         self.clickControlOn = False
-
-        self.ard = serial.Serial(port ="COM5", baudrate ="9600");
-
         self.pinchFlag = False
-        
+
+        # Arduino Params
+        self.ser = self.connect_to_arduino_if_exist()
         self.data = [50]
 
+    def connect_to_arduino_if_exist(self):
+
+        arduino_ports = [
+            p.device
+            for p in serial.tools.list_ports.comports()
+            if 'Arduino' in p.description  # may need tweaking to match new arduinos
+        ]
+        try:
+            if not arduino_ports:
+                raise IOError("No Arduino found")
+            if len(arduino_ports) > 1:
+                warnings.warn('Multiple Arduinos found - using the first')
+            ser = serial.Serial(port =arduino_ports[0], baudrate ="9600");
+        except:
+            print("Arduino is not connected")
+            ser = []
+        return ser
 
     def launchGame(self):
-        
+    
         self.mouseCheckbox.select()
         
         try: 
-            os.startfile('C:\\Users\\GPUser\\Documents\\HandTracking4Sohan-main\\buildfordemo\\buildfordemo\\Sohan_project.exe')
+            #os.startfile('C:\\Users\\GPUser\\Documents\\HandTracking4Sohan-main\\buildfordemo\\buildfordemo\\Sohan_project.exe')
+            # os.startfile(r'C:\Users\basti\git\HandTracking4Sohan\Sohan_project_Unity\Build\buildfordemo2\Sohan_project.exe')
+            os.startfile(self.path_game)
         except Exception as e:
                 print(e)
                 print('Cannot launch game')
@@ -110,8 +180,9 @@ class CameraInterface:
         threadPort.start()
     
     def readPort(self):
-        self.data = self.ard.readline()
-        print('data ' + str(self.data[0]))
+        if self.ser:
+            self.data = self.ser.readline()
+            print('data ' + str(self.data[0]))
     
     def doAction(self):
         print("do action")
@@ -120,9 +191,27 @@ class CameraInterface:
         if self.varMouse.get():
             print("mouseOn")
             self.mouseOn = True
+            self.use_cam = True
+            self.red["state"] = "active"
+            self.red['bg']="Red"
+            self.green["state"] = "active"
+            self.green['bg']="SpringGreen2"
+            self.blue["state"] = "active"
+            self.blue['bg']="Sky Blue"
+
+            
         else:
             print("mouseOff")
             self.mouseOn = False
+            self.use_cam = False
+            self.red["state"] = "disabled"
+            self.red['bg']="gray72"
+            self.green["state"] = "disabled"
+            self.green['bg']="gray72"
+            self.blue["state"] = "disabled"
+            self.blue['bg']="gray72"
+
+            
 
     def selected(self):
         if self.varMouse.get():
@@ -163,48 +252,43 @@ class CameraInterface:
             mouse.click()
             # self.mouse.press(mButton.left)
 
-        mouseLoc = (self.screenx - (cx * self.screenx / self.camx), cy * self.screeny / self.camy)
+        mouseLoc = (self.screen_x - (cx * self.screen_x / self.cam_x), cy * self.screen_y / self.cam_y)
         return mouseLoc, pinchFlag
 
     def show_frame(self):
         # read from port
-
-        
         #if self.data[0] is 53:
         #    self.selected()
 
-        ret, self.img = self.cam.read()
+        if self.use_cam:
+            ret, self.img = self.cam.read()
+            # flipping for the selfie cam right now to keep same
+            # self.img = cv2.flip(self.img, 1)
+            self.img = cv2.resize(self.img, (self.cam_x, self.cam_y))
 
-        # flipping for the selfie cam right now to keep sane
+            # convert BGR to HSV
+            frame = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
+            imgHSV = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
+        
+            # create the Mask + morphology
+            mask = cv2.inRange(imgHSV, self.lowerBound, self.upperBound)
+            maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernelOpen)
+            maskClose = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, self.kernelClose)
 
-        # self.img = cv2.flip(self.img, 1)
-        self.img = cv2.resize(self.img, (self.camx, self.camy))
+            maskFinal = maskClose
+            conts, h = cv2.findContours( maskFinal.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            n_objects = len(conts)
+            cv2.drawContours(frame, conts, -1, (255, 0, 0), 3)
 
-        # convert BGR to HSV
-        frame = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
-        imgHSV = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
-        # create the Mask
-        mask = cv2.inRange(imgHSV, self.lowerBound, self.upperBound)
-        # morphology
-        maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernelOpen)
-        maskClose = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, self.kernelClose)
+            if conts:
+                x, y, w, h = cv2.boundingRect(conts[0])
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                x1, y1, w1, h1 = cv2.boundingRect(conts[0])
+                x1 = int(x1 + w1 / 2)
+                y1 = int(y1 + h1 / 2)
+                cv2.circle(frame, (x1, y1), 2, (0, 0, 255), 2)
 
-        maskFinal = maskClose
-        conts, h = cv2.findContours(maskFinal.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-        n_objects = len(conts)
-
-        cv2.drawContours(frame, conts, -1, (255, 0, 0), 3)
-
-        if conts:
-            x, y, w, h = cv2.boundingRect(conts[0])
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            x1, y1, w1, h1 = cv2.boundingRect(conts[0])
-            x1 = int(x1 + w1 / 2)
-            y1 = int(y1 + h1 / 2)
-            cv2.circle(frame, (x1, y1), 2, (0, 0, 255), 2)
-
-            if self.mouseOn:
+            if self.mouseOn and len(conts) == 1:   # CHANGE HERE and len(conts) == 1 
 
                 if (self.pinchFlag):  # perform only if pinch is on
                     self.pinchFlag = False
@@ -212,36 +296,60 @@ class CameraInterface:
                     mouse.release()
 
                 # Compute mouse location
-                mouseLoc = ( (x1 * self.screenx / self.camx), y1 * self.screeny / self.camy)
-                #x = self.screenx - (x1 * self.screenx / self.camx)
-                #y = y1 * self.screeny / self.camy
-                
-                mouse.move(mouseLoc[0], mouseLoc[1])
-                # mouse.position = mouseLoc
+                mouseLoc = ( (x1 * self.screen_x / self.cam_x), y1 * self.screen_y / self.cam_y)
+                mouse.move(mouseLoc[0],mouseLoc[1])
 
+                # Check for clicks
                 # If there is only one object, it means both finger
                 # (objects) collided so a click take place
                 #if n_objects == 1:
                 #    print("click")
                 #    mouseLoc, pinchFlag = self.click(self.pinchFlag, conts)
                 #
-                self.mouse.position = mouseLoc
+                # self.mouse.position = mouseLoc
 
             # TO BE IMPLEMENTED
             if self.clickControlOn:
                 print("click control on")
 
+        else:
+
+            frame = np.zeros((self.cam_y,self.cam_x,3), np.uint8)
+            
+            cv2.circle(frame, (int(self.cam_x/2),int(self.cam_y/2)), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
+            
+            cv2.circle(frame, (self.coord_x,int(self.cam_y/2)), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
+            cv2.circle(frame, (self.cam_x-self.coord_x,int(self.cam_y/2)), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
+
+            cv2.circle(frame, (int(self.cam_x/2),self.coord_y), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
+            cv2.circle(frame, (int(self.cam_x/2),self.cam_y-self.coord_y), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
+            
+            if not self.use_cam:
+                cv2.circle(frame, (int(self.cam_x/4),int(self.cam_y/4)), self.circle_radius, self.circle_color_switch, self.circle_thickness)
+            else:
+                cv2.circle(frame, (int(self.cam_x/4),int(self.cam_y/4)), self.circle_radius, self.circle_color_touch, self.circle_thickness)
+
+            
+        # pt1 = (int(self.camx/2), int(self.camy/2))
+        # pt2 = (int(self.camx/4), int(self.camy/4))
+        # cv2.arrowedLine(self.img, pt1, pt2, (0,0,255), 25)
+        # cv2.arrowedLine(self.img, pt2, pt1, (0,0,255), 25)
+        
+        
+        # Show camera output
         imgPIL = PIL.Image.fromarray(frame)
         imgtk = ImageTk.PhotoImage(image=imgPIL)
         self.lmain.imgtk = imgtk
         self.lmain.configure(image=imgtk)
-        self.lmain.after(20, self.show_frame)
+        self.lmain.after(self.refresh_rate, self.show_frame)
 
 
 if __name__ == "__main__":
 
- 
-    camInt = CameraInterface()
+    config_file = r".\config.ini"
+    print('Changing cursor appearance')
+    camInt = CameraInterface(config_file)
     #camInt.startThread()
     camInt.show_frame()
     camInt.root.mainloop()
+
