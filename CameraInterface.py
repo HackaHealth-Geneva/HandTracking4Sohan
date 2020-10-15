@@ -22,10 +22,29 @@ from pynput.keyboard import Key,KeyCode, Controller
 from pynput.mouse import Controller
 from pynput.mouse import Button as mButton
 
-# import unrar
-# from unrar import rarfile
-# from tt import KeyboardController
+# TO DO:
+# [Change to finish interface]
+# - change cursor to img of sohan's hand
+# - automatically uncompress  r"C:\Users\basti\git\HandTracking4Sohan\Sohan_project_Unity\Build\buildfordemo2" 
+# - test arduino triggers should modify the color of the circles blue circle selected should activate the hand tracking
+# - add Keyboard regulations (especially for forcing mouse control - Esc already used for closing game)
+# - contact grid3 compagny + try to solve privilege right
 
+# [Change to improve interface]
+# - click with 2 fingers
+# - improve color detection
+     # -> S1 set hsv upper and lower bound with Region Of Interest:
+         # define ROI of RGB image 'img'
+         # ret, img=cam.read()
+         # r = cv2.selectROI(img)
+         # roi = img[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
+         # # convert it into HSV
+         # hsv = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
+         # # print(hsv)
+# - implementing hand tracking with other methods
+    # if hsv filter doesn't work ex: issue with intensitiy, light 
+    # S1 -> https://github.com/victordibia/handtracking -> python detect_single_threaded.py
+    # TO ADD in the interface 
 
 class CameraInterface:
     def __init__(self,config_file):
@@ -38,8 +57,6 @@ class CameraInterface:
         self.lowerBound = np.array([29, 86, 6])
         self.upperBound = np.array([64, 255, 255])
 
-        # self.lowerBound = np.array([53, 74, 160])
-        # self.upperBound = np.array([90, 147, 255])#h:53-90 s:74-147 v: 160-255
         self.root = Tk()
         self.root.bind('<Escape>', lambda e: self.root.quit())
         self.root.title('HandTracking4Sohan')
@@ -68,19 +85,7 @@ class CameraInterface:
 
         # Game params
         self.path_game = ast.literal_eval(self.config.get("game", "path_game")) 
-        # if not os.path.exists(self.path_game):
-        #     print("Unzipping the game")
-        #     # specifying the zip file name 
-        #     file_name = "buildfordemo2"
-        #     rar = rarfile.RarFile(file_name)
-        #     print(rar.namelist())
 
-        #     rar.extractall()
-        #     print('Extracting all the files now...') 
-        #     print('Done!') 
-
-        self.font = cv2.FONT_HERSHEY_SIMPLEX
-        
         # Mouse Controller
         self.varMouse = IntVar()
         self.varClick = IntVar()
@@ -97,16 +102,13 @@ class CameraInterface:
 
         # Interface 
         self.lmain = Label(self.root)
-
-
         self.red = Button(self.root, text="red", command=self.detectRed,state='disabled',bg='gray72')
         self.green = Button(self.root, text="green", command=self.detectGreen,state='disabled',bg='gray72')
         self.blue = Button(self.root, text="blue", command=self.detectBlue,state='disabled',bg='gray72')
-        # self.rgbContainer = Label(self.root, text="test")
         self.mouseCheckbox = Checkbutton(self.root, text="Mouse Controller On/Off", variable=self.varMouse, command=self.mouseMovement,background="gray77")
-        # self.clickCheckbox = Checkbutton(self.root, text="control with click?", variable=self.varClick, command=self.clickControl)
         self.gameButton = Button(self.root, text="Game Training", command=self.launchGame, bg="violet")
-
+        # self.rgbContainer = Label(self.root, text="test")
+        # self.clickCheckbox = Checkbutton(self.root, text="control with click?", variable=self.varClick, command=self.clickControl)
         # self.startCam = Button(self.root, text="start camera", command=self.startThread)
 
         self.lmain.grid(row=0, column=0, columnspan=2)
@@ -117,8 +119,8 @@ class CameraInterface:
 
 
         self.mouseCheckbox.grid(row=1, column=1,  sticky='nesw')
-        # self.clickCheckbox.grid(row=2, column=1,  sticky='nesw')
         self.gameButton.grid(row=4, column=0, columnspan=2, sticky='nesw')
+        # self.clickCheckbox.grid(row=2, column=1,  sticky='nesw')
         # self.startCam.grid(row=4, column=0, columnspan=3)
 
         self.screen_x = self.root.winfo_screenwidth()
@@ -154,10 +156,7 @@ class CameraInterface:
     def launchGame(self):
     
         self.mouseCheckbox.select()
-        
         try: 
-            #os.startfile('C:\\Users\\GPUser\\Documents\\HandTracking4Sohan-main\\buildfordemo\\buildfordemo\\Sohan_project.exe')
-            # os.startfile(r'C:\Users\basti\git\HandTracking4Sohan\Sohan_project_Unity\Build\buildfordemo2\Sohan_project.exe')
             os.startfile(self.path_game)
         except Exception as e:
                 print(e)
@@ -198,8 +197,6 @@ class CameraInterface:
             self.green['bg']="SpringGreen2"
             self.blue["state"] = "active"
             self.blue['bg']="Sky Blue"
-
-            
         else:
             print("mouseOff")
             self.mouseOn = False
@@ -256,10 +253,8 @@ class CameraInterface:
         return mouseLoc, pinchFlag
 
     def show_frame(self):
-        # read from port
-        #if self.data[0] is 53:
-        #    self.selected()
-
+        
+        # CAMERA HAND TRACKING
         if self.use_cam:
             ret, self.img = self.cam.read()
             # flipping for the selfie cam right now to keep same
@@ -313,9 +308,13 @@ class CameraInterface:
                 print("click control on")
 
         else:
-
+            # TOUCH DETECTION
             frame = np.zeros((self.cam_y,self.cam_x,3), np.uint8)
             
+            # ARDUINO READING 
+            # if self.data[0] is 53:
+            #    self.selected()
+        
             cv2.circle(frame, (int(self.cam_x/2),int(self.cam_y/2)), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
             
             cv2.circle(frame, (self.coord_x,int(self.cam_y/2)), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
@@ -329,14 +328,7 @@ class CameraInterface:
             else:
                 cv2.circle(frame, (int(self.cam_x/4),int(self.cam_y/4)), self.circle_radius, self.circle_color_touch, self.circle_thickness)
 
-            
-        # pt1 = (int(self.camx/2), int(self.camy/2))
-        # pt2 = (int(self.camx/4), int(self.camy/4))
-        # cv2.arrowedLine(self.img, pt1, pt2, (0,0,255), 25)
-        # cv2.arrowedLine(self.img, pt2, pt1, (0,0,255), 25)
-        
-        
-        # Show camera output
+        # OUTPUT VISUALIZATION
         imgPIL = PIL.Image.fromarray(frame)
         imgtk = ImageTk.PhotoImage(image=imgPIL)
         self.lmain.imgtk = imgtk
