@@ -35,11 +35,11 @@ class CameraInterface:
         self.config = configparser.ConfigParser()
         self.config.read(self.config_file)
         
-        # self.lowerBound = np.array([29, 86, 6])
-        # self.upperBound = np.array([64, 255, 255])
+        self.lowerBound = np.array([29, 86, 6])
+        self.upperBound = np.array([64, 255, 255])
 
-        self.lowerBound = np.array([53, 74, 160])
-        self.upperBound = np.array([90, 147, 255])#h:53-90 s:74-147 v: 160-255
+        # self.lowerBound = np.array([53, 74, 160])
+        # self.upperBound = np.array([90, 147, 255])#h:53-90 s:74-147 v: 160-255
         self.root = Tk()
         self.root.bind('<Escape>', lambda e: self.root.quit())
         self.root.title('HandTracking4Sohan')

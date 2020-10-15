@@ -47,15 +47,15 @@ pauseMode = False
 lowerBound = np.array([29,86,60])
 upperBound = np.array([64, 255, 150])
 
-lowerBound = np.array([29,86,6])
-upperBound = np.array([74, 255, 255])
+# lowerBound = np.array([29,86,6])
+# upperBound = np.array([74, 255, 255])
 
-pic_path = r'C:\Users\basti\git\HandTracking4Sohan\HackaHealth_Logo_HR.png'
+# pic_path = r'C:\Users\basti\git\HandTracking4Sohan\HackaHealth_Logo_HR.png'
 
-window = pyglet.window.Window()
-image = pyglet.image.load(pic_path)
-cursor = pyglet.window.ImageMouseCursor(image, 16, 8)
-window.set_mouse_cursor(cursor)
+# window = pyglet.window.Window()
+# image = pyglet.image.load(pic_path)
+# cursor = pyglet.window.ImageMouseCursor(image, 16, 8)
+# window.set_mouse_cursor(cursor)
 
 while True:
     ret, img=cam.read()
