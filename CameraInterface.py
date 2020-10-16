@@ -16,7 +16,7 @@ import serial.tools.list_ports
 
 from PIL import Image,ImageTk
 from tkinter import *
-
+from PyQt5.QtCore import QThread, pyqtSignal,Qt,pyqtSlot
 from os import path
 from pynput.keyboard import Key,KeyCode, Controller
 from pynput.mouse import Controller
@@ -46,9 +46,31 @@ from pynput.mouse import Button as mButton
     # S1 -> https://github.com/victordibia/handtracking -> python detect_single_threaded.py
     # TO ADD in the interface 
 
+class ReadLine:
+    def __init__(self, s):
+        self.buf = bytearray()
+        self.s = s
+
+    def readline(self):
+        i = self.buf.find(b"\n")
+        if i >= 0:
+            r = self.buf[:i+1]
+            self.buf = self.buf[i+1:]
+            return r
+        while True:
+            i = max(1, min(2048, self.s.in_waiting))
+            data = self.s.read(i)
+            i = data.find(b"\n")
+            if i >= 0:
+                r = self.buf + data[:i+1]
+                self.buf[0:] = data[i+1:]
+                return r
+            else:
+                self.buf.extend(data)
+
 class CameraInterface:
     def __init__(self,config_file):
-
+        
         # READ CONFIG FILE
         self.config_file = config_file
         self.config = configparser.ConfigParser()
@@ -91,21 +113,12 @@ class CameraInterface:
         self.varClick = IntVar()
         self.mouse = Controller()
 
-        # Capacitive sensor
-        self.coord_x = 120
-        self.coord_y = 60
-        self.circle_radius = 10
-        self.circle_color_arrow = (255, 0, 0)
-        self.circle_color_switch = (0, 0, 255)
-        self.circle_color_touch = (0, 255, 0)
-        self.circle_thickness = -5
-
         # Interface 
         self.lmain = Label(self.root)
         self.red = Button(self.root, text="red", command=self.detectRed,state='disabled',bg='gray72')
         self.green = Button(self.root, text="green", command=self.detectGreen,state='disabled',bg='gray72')
         self.blue = Button(self.root, text="blue", command=self.detectBlue,state='disabled',bg='gray72')
-        self.mouseCheckbox = Checkbutton(self.root, text="Mouse Controller On/Off", variable=self.varMouse, command=self.mouseMovement,background="gray77")
+        self.mouseCheckbox = Checkbutton(self.root, text="Mouse Controller On/Off", variable=self.varMouse, command=self.mouseMovement,background="gray77",state='normal')
         self.gameButton = Button(self.root, text="Game Training", command=self.launchGame, bg="violet")
         # self.rgbContainer = Label(self.root, text="test")
         # self.clickCheckbox = Checkbutton(self.root, text="control with click?", variable=self.varClick, command=self.clickControl)
@@ -131,12 +144,31 @@ class CameraInterface:
         self.clickControlOn = False
         self.pinchFlag = False
 
+        # Capacitive sensor
+        self.coord_x = 120
+        self.coord_y = 60
+        self.circle_radius = 10
+        self.circle_color_arrow = (255, 0, 0)
+        self.circle_color_switch = (0, 0, 255)
+        self.circle_color_touch = (0, 255, 0)
+        self.circle_thickness = -5
+
+        self.buttons = [
+                        [int(self.cam_x/4),int(self.cam_y/4),3214602],
+                        [int(self.cam_x/2),self.cam_y-self.coord_y,3673354],
+                        [self.coord_x,int(self.cam_y/2),3411210],
+                        [int(self.cam_x/2),int(self.cam_y/2),3476746],
+                        [self.cam_x-self.coord_x,int(self.cam_y/2),3542282],
+                        [int(self.cam_x/2),self.coord_y,3280138]
+                        ]
+            
         # Arduino Params
-        self.ser = self.connect_to_arduino_if_exist()
-        self.data = [50]
+        self.ser  = self.connect_to_arduino_if_exist()
+        self.data = ReadLine(self.ser) 
+        self.data_ = None
 
     def connect_to_arduino_if_exist(self):
-
+        print("Connection to Arduino")
         arduino_ports = [
             p.device
             for p in serial.tools.list_ports.comports()
@@ -151,7 +183,9 @@ class CameraInterface:
         except:
             print("Arduino is not connected")
             ser = []
+        print("Arduino is connected")
         return ser
+
 
     def launchGame(self):
     
@@ -253,12 +287,29 @@ class CameraInterface:
         return mouseLoc, pinchFlag
 
     def show_frame(self):
-        
+
+        # TOUCH DETECTION
+        if self.ser and not self.varMouse.get():
+            self.data_ = self.data.readline()
+            self.data_ = int.from_bytes(self.data_, byteorder='big', signed=False)
+            print(self.data_)
+            frame = np.zeros((self.cam_y,self.cam_x,3), np.uint8)
+            # ARDUINO READING 
+            #print(int.from_bytes(self.data.readline(), byteorder='big', signed=False))
+            for iButton in range(len(self.buttons)):
+                cv2.circle(frame, (self.buttons[iButton][0],self.buttons[iButton][1]), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
+                if self.data_ == self.buttons[iButton][2]:
+                    cv2.circle(frame, (self.buttons[iButton][0],self.buttons[iButton][1]), self.circle_radius, self.circle_color_touch, self.circle_thickness)
+                    if iButton == 0:
+                        self.varMouse.set(True)
+
+
         # CAMERA HAND TRACKING
-        if self.use_cam:
+        else:
+            #if self.varMouse.get()
             ret, self.img = self.cam.read()
             # flipping for the selfie cam right now to keep same
-            # self.img = cv2.flip(self.img, 1)
+            self.img = cv2.flip(self.img, 1)
             self.img = cv2.resize(self.img, (self.cam_x, self.cam_y))
 
             # convert BGR to HSV
@@ -282,17 +333,17 @@ class CameraInterface:
                 x1 = int(x1 + w1 / 2)
                 y1 = int(y1 + h1 / 2)
                 cv2.circle(frame, (x1, y1), 2, (0, 0, 255), 2)
-
-            if self.mouseOn and len(conts) == 1:   # CHANGE HERE and len(conts) == 1 
-
-                if (self.pinchFlag):  # perform only if pinch is on
-                    self.pinchFlag = False
-                    # self.mouse.release(mButton.left)
-                    mouse.release()
-
                 # Compute mouse location
                 mouseLoc = ( (x1 * self.screen_x / self.cam_x), y1 * self.screen_y / self.cam_y)
-                mouse.move(mouseLoc[0],mouseLoc[1])
+                if self.varMouse.get():
+                    mouse.move(mouseLoc[0],mouseLoc[1])
+
+            # if self.mouseOn and len(conts) == 1:   # CHANGE HERE and len(conts) == 1 
+
+            #     if (self.pinchFlag):  # perform only if pinch is on
+            #         self.pinchFlag = False
+            #         # self.mouse.release(mButton.left)
+            #         mouse.release()
 
                 # Check for clicks
                 # If there is only one object, it means both finger
@@ -306,27 +357,6 @@ class CameraInterface:
             # TO BE IMPLEMENTED
             if self.clickControlOn:
                 print("click control on")
-
-        else:
-            # TOUCH DETECTION
-            frame = np.zeros((self.cam_y,self.cam_x,3), np.uint8)
-            
-            # ARDUINO READING 
-            # if self.data[0] is 53:
-            #    self.selected()
-        
-            cv2.circle(frame, (int(self.cam_x/2),int(self.cam_y/2)), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
-            
-            cv2.circle(frame, (self.coord_x,int(self.cam_y/2)), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
-            cv2.circle(frame, (self.cam_x-self.coord_x,int(self.cam_y/2)), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
-
-            cv2.circle(frame, (int(self.cam_x/2),self.coord_y), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
-            cv2.circle(frame, (int(self.cam_x/2),self.cam_y-self.coord_y), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
-            
-            if not self.use_cam:
-                cv2.circle(frame, (int(self.cam_x/4),int(self.cam_y/4)), self.circle_radius, self.circle_color_switch, self.circle_thickness)
-            else:
-                cv2.circle(frame, (int(self.cam_x/4),int(self.cam_y/4)), self.circle_radius, self.circle_color_touch, self.circle_thickness)
 
         # OUTPUT VISUALIZATION
         imgPIL = PIL.Image.fromarray(frame)
