@@ -12,7 +12,12 @@ import warnings
 import serial
 import serial.tools.list_ports
 
+import ctypes
+import math
+import time
 
+from ctypes import c_long, POINTER, sizeof, c_int
+from ctypes.wintypes import DWORD
 
 from PIL import Image,ImageTk
 from tkinter import *
@@ -45,6 +50,39 @@ from pynput.mouse import Button as mButton
     # if hsv filter doesn't work ex: issue with intensitiy, light 
     # S1 -> https://github.com/victordibia/handtracking -> python detect_single_threaded.py
     # TO ADD in the interface 
+class MOUSEINPUT(ctypes.Structure):
+    _fields_ = [
+        ("dx", c_long),
+        ("dy", c_long),
+        ("mouseData", DWORD),
+        ("dwFlags", DWORD),
+        ("time", DWORD),
+        ("dwExtraInfo", POINTER(c_long)),
+    ]
+
+# https://msdn.microsoft.com/ru-RU/library/windows/desktop/ms646270%28v=vs.85%29.aspx
+# typedef struct tagINPUT {
+#   DWORD type;
+#   union {
+#     MOUSEINPUT    mi;
+#     KEYBDINPUT    ki;
+#     HARDWAREINPUT hi;
+#   };
+# } INPUT, *PINPUT;
+class INPUT(ctypes.Structure):
+    _fields_ = [
+        ("type", DWORD),
+        ("mi", MOUSEINPUT),
+    ]
+
+# Define required native Win32 API constants
+
+INPUT_MOUSE = 0
+
+# https://msdn.microsoft.com/ru-RU/library/windows/desktop/ms646273%28v=vs.85%29.aspx
+MOUSEEVENTF_MOVE     = 0x001
+MOUSEEVENTF_LEFTDOWN = 0x002
+MOUSEEVENTF_LEFTUP   = 0x004
 
 class ReadLine:
     def __init__(self, s):
@@ -111,7 +149,7 @@ class CameraInterface:
         # Mouse Controller
         self.varMouse = IntVar()
         self.varClick = IntVar()
-        self.mouse = Controller()
+        #self.mouse = Controller()
 
         # Interface 
         self.lmain = Label(self.root)
@@ -166,6 +204,12 @@ class CameraInterface:
         self.ser  = self.connect_to_arduino_if_exist()
         self.data = ReadLine(self.ser) 
         self.data_ = None
+        self.set_cursor_pos_func = ctypes.windll.user32.SetCursorPos
+        self.send_input_func = ctypes.windll.user32.SendInput
+        self.last_click = time.clock()
+
+
+
 
     def connect_to_arduino_if_exist(self):
         print("Connection to Arduino")
@@ -286,16 +330,38 @@ class CameraInterface:
         mouseLoc = (self.screen_x - (cx * self.screen_x / self.cam_x), cy * self.screen_y / self.cam_y)
         return mouseLoc, pinchFlag
 
+    def control_cursor_mvt(self,mouseLoc):
+        if self.varMouse.get():
+            self.set_cursor_pos_func(int(mouseLoc[0]),int(mouseLoc[1]))
+            if self.t - self.last_click > 0.3:
+                # Every 0.3 seconds perform clicks
+                last_click = self.t
+                # To click I need to fill INPUT structure
+                inp = INPUT()
+                inp.type = INPUT_MOUSE
+                inp.mi.dx = 0
+                inp.mi.dy = 0
+                inp.mi.mouseData = 0
+                inp.mi.time = 0
+                inp.mi.dwExtraInfo = None
+                # Send mouse down input event
+                inp.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTDOWN
+                res = self.send_input_func(1, ctypes.pointer(inp), sizeof(INPUT))
+                if res != 1:
+                    ctypes.FormatError(ctypes.GetLastError())
+                # Send mouse up input event
+                inp.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTUP
+                res = self.send_input_func(1, ctypes.pointer(inp), sizeof(INPUT))
+                if res != 1:
+                    ctypes.FormatError(ctypes.GetLastError())
+
     def show_frame(self):
 
         # TOUCH DETECTION
         if self.ser and not self.varMouse.get():
-            self.data_ = self.data.readline()
-            self.data_ = int.from_bytes(self.data_, byteorder='big', signed=False)
+            self.data_ = int.from_bytes(self.data_.readline(), byteorder='big', signed=False)
             print(self.data_)
             frame = np.zeros((self.cam_y,self.cam_x,3), np.uint8)
-            # ARDUINO READING 
-            #print(int.from_bytes(self.data.readline(), byteorder='big', signed=False))
             for iButton in range(len(self.buttons)):
                 cv2.circle(frame, (self.buttons[iButton][0],self.buttons[iButton][1]), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
                 if self.data_ == self.buttons[iButton][2]:
@@ -306,7 +372,7 @@ class CameraInterface:
 
         # CAMERA HAND TRACKING
         else:
-            #if self.varMouse.get()
+            self.t = time.clock()
             ret, self.img = self.cam.read()
             # flipping for the selfie cam right now to keep same
             self.img = cv2.flip(self.img, 1)
@@ -323,28 +389,28 @@ class CameraInterface:
 
             maskFinal = maskClose
             conts, h = cv2.findContours( maskFinal.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-            n_objects = len(conts)
-            cv2.drawContours(frame, conts, -1, (255, 0, 0), 3)
 
+            # Drawing 
+            cv2.drawContours(frame, conts, -1, (255, 0, 0), 3)
             if conts:
                 x, y, w, h = cv2.boundingRect(conts[0])
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
                 x1, y1, w1, h1 = cv2.boundingRect(conts[0])
-                x1 = int(x1 + w1 / 2)
-                y1 = int(y1 + h1 / 2)
-                cv2.circle(frame, (x1, y1), 2, (0, 0, 255), 2)
-                # Compute mouse location
-                mouseLoc = ( (x1 * self.screen_x / self.cam_x), y1 * self.screen_y / self.cam_y)
-                if self.varMouse.get():
-                    mouse.move(mouseLoc[0],mouseLoc[1])
+                center_x = int(x1 + w1 / 2)
+                center_y = int(y1 + h1 / 2)
+                cv2.circle(frame, (center_x, center_y), 2, (0, 0, 255), 2)
+                
+            if self.varMouse.get() and conts:
+                mouseLoc = ( (center_x * self.screen_x / self.cam_x), center_y * self.screen_y / self.cam_y)
+                self.control_cursor_mvt(mouseLoc)
 
+            # n_objects = len(conts)
             # if self.mouseOn and len(conts) == 1:   # CHANGE HERE and len(conts) == 1 
 
             #     if (self.pinchFlag):  # perform only if pinch is on
             #         self.pinchFlag = False
             #         # self.mouse.release(mButton.left)
             #         mouse.release()
-
                 # Check for clicks
                 # If there is only one object, it means both finger
                 # (objects) collided so a click take place
