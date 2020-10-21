@@ -3,5 +3,7 @@ opencv-python >= 2.0.0
 pynput
 Pillow
 numpy
+mouse
+pyserial
 # pyqt
 
