@@ -50,6 +50,7 @@ from pynput.mouse import Button as mButton
     # if hsv filter doesn't work ex: issue with intensitiy, light 
     # S1 -> https://github.com/victordibia/handtracking -> python detect_single_threaded.py
     # TO ADD in the interface 
+
 class MOUSEINPUT(ctypes.Structure):
     _fields_ = [
         ("dx", c_long),
@@ -84,6 +85,19 @@ MOUSEEVENTF_MOVE     = 0x001
 MOUSEEVENTF_LEFTDOWN = 0x002
 MOUSEEVENTF_LEFTUP   = 0x004
 
+class Thread(threading.Thread):
+    def __init__(self,ser):
+        threading.Thread.__init__(self)
+        self.ser= ser
+        self.data = ReadLine(ser)
+
+    def start(self):
+       self.data_ = int.from_bytes(self.data.readline(), byteorder='big', signed=False)
+
+    def update_value(self):
+        return self.data_
+
+
 class ReadLine:
     def __init__(self, s):
         self.buf = bytearray()
@@ -110,6 +124,7 @@ class CameraInterface:
     def __init__(self,config_file):
         
         # READ CONFIG FILE
+        global dataXX
         self.config_file = config_file
         self.config = configparser.ConfigParser()
         self.config.read(self.config_file)
@@ -142,7 +157,19 @@ class CameraInterface:
         self.kernelClose = np.ones((kernel_c, kernel_c))
         self.cam = cv2.VideoCapture(cam_id)
         # ret, self.img = self.cam.read()
+        
+        # Arduino Params
+        self.ser  = self.connect_to_arduino_if_exist()
+        if self.ser:
+            self.use_cam = False
+            self.data = ReadLine(self.ser) 
+            self.data_ = None
+        # self.thread_ = Thread(self.ser)
+        # self.thread_.start()
+        self.t1 = threading.Thread(target=self.read_value_from_arduino)
+        self.t1.start()
 
+            
         # Game params
         self.path_game = ast.literal_eval(self.config.get("game", "path_game")) 
 
@@ -167,7 +194,6 @@ class CameraInterface:
         self.green.grid(row=2, column=0, sticky='nesw',pady=1)
         self.blue.grid(row=3, column=0, sticky='nesw',pady=1)
         # self.rgbContainer.grid(row=1, column=1, rowspan=3, sticky='nesw')
-
 
         self.mouseCheckbox.grid(row=1, column=1,  sticky='nesw')
         self.gameButton.grid(row=4, column=0, columnspan=2, sticky='nesw')
@@ -199,17 +225,13 @@ class CameraInterface:
                         [self.cam_x-self.coord_x,int(self.cam_y/2),3542282],
                         [int(self.cam_x/2),self.coord_y,3280138]
                         ]
-            
-        # Arduino Params
-        self.ser  = self.connect_to_arduino_if_exist()
-        self.data = ReadLine(self.ser) 
-        self.data_ = None
+        
         self.set_cursor_pos_func = ctypes.windll.user32.SetCursorPos
         self.send_input_func = ctypes.windll.user32.SendInput
         self.last_click = time.clock()
 
-
-
+    def read_value_from_arduino(self):
+        self.data_ = int.from_bytes(self.data.readline(), byteorder='big', signed=False)
 
     def connect_to_arduino_if_exist(self):
         print("Connection to Arduino")
@@ -251,15 +273,6 @@ class CameraInterface:
     def detectBlue(self):
         self.lowerBound = np.array([110, 150, 100])
         self.upperBound = np.array([120, 255, 255])
-
-    def startThread(self):
-        threadPort = threading.Thread(target=self.readPort)
-        threadPort.start()
-    
-    def readPort(self):
-        if self.ser:
-            self.data = self.ser.readline()
-            print('data ' + str(self.data[0]))
     
     def doAction(self):
         print("do action")
@@ -287,7 +300,6 @@ class CameraInterface:
             self.blue['bg']="gray72"
 
             
-
     def selected(self):
         if self.varMouse.get():
             self.mouseCheckbox.deselect()
@@ -356,22 +368,26 @@ class CameraInterface:
                     ctypes.FormatError(ctypes.GetLastError())
 
     def show_frame(self):
-
+        
         # TOUCH DETECTION
-        if self.ser and not self.varMouse.get():
-            self.data_ = int.from_bytes(self.data_.readline(), byteorder='big', signed=False)
-            print(self.data_)
+        if self.ser and not self.use_cam:
+            # self.data_ = int.from_bytes(self.data.readline(), byteorder='big', signed=False)
+            # print(self.data_)
+            if self.data_ is not None and self.data_ == self.buttons[0][2]:
+                if self.use_cam: 
+                    self.use_cam = False
+                else:
+                    self.use_cam = True
+
+            # self.varMouse.set(True) # uncomment when working well
             frame = np.zeros((self.cam_y,self.cam_x,3), np.uint8)
             for iButton in range(len(self.buttons)):
                 cv2.circle(frame, (self.buttons[iButton][0],self.buttons[iButton][1]), self.circle_radius, self.circle_color_arrow, self.circle_thickness)
-                if self.data_ == self.buttons[iButton][2]:
-                    cv2.circle(frame, (self.buttons[iButton][0],self.buttons[iButton][1]), self.circle_radius, self.circle_color_touch, self.circle_thickness)
-                    if iButton == 0:
-                        self.varMouse.set(True)
-
+                if self.data_ is not None and self.data_ == self.buttons[iButton][2]:
+                     cv2.circle(frame, (self.buttons[iButton][0],self.buttons[iButton][1]), self.circle_radius, self.circle_color_touch, self.circle_thickness)
 
         # CAMERA HAND TRACKING
-        else:
+        elif self.use_cam or self.varMouse.get():
             self.t = time.clock()
             ret, self.img = self.cam.read()
             # flipping for the selfie cam right now to keep same
@@ -399,37 +415,40 @@ class CameraInterface:
                 center_x = int(x1 + w1 / 2)
                 center_y = int(y1 + h1 / 2)
                 cv2.circle(frame, (center_x, center_y), 2, (0, 0, 255), 2)
+                mouseLoc = ( (center_x * self.screen_x / self.cam_x), center_y * self.screen_y / self.cam_y)
+                
                 
             if self.varMouse.get() and conts:
-                mouseLoc = ( (center_x * self.screen_x / self.cam_x), center_y * self.screen_y / self.cam_y)
                 self.control_cursor_mvt(mouseLoc)
-
-            # n_objects = len(conts)
-            # if self.mouseOn and len(conts) == 1:   # CHANGE HERE and len(conts) == 1 
-
-            #     if (self.pinchFlag):  # perform only if pinch is on
-            #         self.pinchFlag = False
-            #         # self.mouse.release(mButton.left)
-            #         mouse.release()
-                # Check for clicks
-                # If there is only one object, it means both finger
-                # (objects) collided so a click take place
-                #if n_objects == 1:
-                #    print("click")
-                #    mouseLoc, pinchFlag = self.click(self.pinchFlag, conts)
-                #
-                # self.mouse.position = mouseLoc
-
-            # TO BE IMPLEMENTED
-            if self.clickControlOn:
-                print("click control on")
 
         # OUTPUT VISUALIZATION
         imgPIL = PIL.Image.fromarray(frame)
         imgtk = ImageTk.PhotoImage(image=imgPIL)
         self.lmain.imgtk = imgtk
         self.lmain.configure(image=imgtk)
-        self.lmain.after(self.refresh_rate, self.show_frame)
+        self.lmain.after(self.refresh_rate,self.show_frame)
+
+        if cv2.waitKey(0) == 27:
+            print ("Quit Application")
+            self.root.quit()
+        
+        # n_objects = len(conts)
+        # if self.mouseOn and len(conts) == 1:   # CHANGE HERE and len(conts) == 1 
+        #     if (self.pinchFlag):  # perform only if pinch is on
+        #         self.pinchFlag = False
+        #         # self.mouse.release(mButton.left)
+        #         mouse.release()
+            # Check for clicks
+            # If there is only one object, it means both finger
+            # (objects) collided so a click take place
+            #if n_objects == 1:
+            #    print("click")
+            #    mouseLoc, pinchFlag = self.click(self.pinchFlag, conts)
+            #
+            # self.mouse.position = mouseLoc
+        # TO BE IMPLEMENTED
+        # if self.clickControlOn:
+            # print("click control on")
 
 
 if __name__ == "__main__":
