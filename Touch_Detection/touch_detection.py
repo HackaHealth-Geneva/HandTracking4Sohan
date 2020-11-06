@@ -30,7 +30,7 @@ def activate_button(case):
      #print(case)
 
 
-def disactivate_button(case):	  
+def disactivate_button(case):
     if mpr121[case].value==False:
      end_direction =time.monotonic()
 

@@ -8,13 +8,22 @@ import pyglet
 import mouse
 import time 
 from time import sleep
+import pyautogui
 
-lowerBound = np.array([29,86,6])
-upperBound = np.array([64, 255, 255])
+
+# GREEN
+#lowerBound = np.array([29,86,6])
+#upperBound = np.array([64, 255, 255])
+
+
+# RED
+lowerBound = np.array([170, 120, 150])
+upperBound = np.array([190, 255, 255])
+
 
 cam= cv2.VideoCapture(0)
 kernelOpen=np.ones((5,5))
-kernelClose=np.ones((20,20))
+kernelClose=np.ones((10,10))
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -42,7 +51,7 @@ pauseMode = False
 # roi = img[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
 # # convert it into HSV
 # hsv = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
-# # print(hsv)
+# # print(hsv)s
 
 lowerBound = np.array([29,86,60])
 upperBound = np.array([64, 255, 150])
@@ -75,18 +84,18 @@ while True:
             
         cv2.drawContours(img,conts,-1,(255,0,0),3)
         # for i in range(len(conts)):
-        if conts: 
-            x,y,w,h=cv2.boundingRect(conts[0])
-            cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255), 2)
-            x1,y1,w1,h1=cv2.boundingRect(conts[0])
-            x1=int(x1+w1/2)
-            y1=int(y1+h1/2)
-            cv2.circle(img, (x1,y1),2,(0,0,255),2)
-            #mouseLoc = (sx - (x1 * sx / camx), y1 * sy / camy)
-            x =sx - (x1 * sx / camx)
-            y =y1 * sy / camy
+        # if conts: 
+        #     x,y,w,h=cv2.boundingRect(conts[0])
+        #     cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255), 2)
+        #     x1,y1,w1,h1=cv2.boundingRect(conts[0])
+        #     x1=int(x1+w1/2)
+        #     y1=int(y1+h1/2)
+        #     cv2.circle(img, (x1,y1),2,(0,0,255),2)
+        #     #mouseLoc = (sx - (x1 * sx / camx), y1 * sy / camy)
+        #     x =sx - (x1 * sx / camx)
+        #     y =y1 * sy / camy
             
-            mouse.move(int(x),int(y))
+        #     mouse.move(int(x),int(y))
            
             
     
@@ -98,11 +107,10 @@ while True:
             #mouse.position = mouseLoc
             # while mouse.position != mouseLoc:
                # pass
-    
-            
-            # cv2.imshow("maskClose",maskClose)
-            # cv2.imshow("maskOpen",maskOpen)
-            # cv2.imshow("mask",mask)
+    cv2.imshow("maskClose",maskClose)
+    cv2.imshow("maskOpen",maskOpen)
+    cv2.imshow("mask",mask)
+    cv2.imshow("mask2",maskFinal)
     cv2.imshow("cam",img)
     
     key = cv2.waitKey(1) & 0xFF
