@@ -1,4 +1,6 @@
 import ctypes
+import win32gui
+from win32gui import GetWindowRect
 
 EnumWindows = ctypes.windll.user32.EnumWindows
 EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
@@ -23,9 +25,18 @@ def foreach_window(hwnd, lParam):
     return True
 
 EnumWindows(EnumWindowsProc(foreach_window), 0)
-
 print(titles)
+print(hwnds)
+
+index_grid = None
+for i,title_ in enumerate(titles):
+    result = title_.startswith('Grid 3')
+    if result:
+        index_grid = i
+        print("Found Grid 3")
+        print(titles[i])
+        (left, top, right, bottom) = GetWindowRect(hwnds[i])
+        print(left, top, right, bottom)
 
 print(GetForegroundWindow())
 
-# SetForeground(hwnds[3])
