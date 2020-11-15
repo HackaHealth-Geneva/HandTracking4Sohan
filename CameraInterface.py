@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import threading
 import queue
-from multiprocessing import Queue, Process
+from queue import Empty
 import configparser
 
 import ast
@@ -15,9 +15,6 @@ import serial
 import serial.tools.list_ports
 
 import win32gui
-import win32con
-import pyautogui
-
 import ctypes
 import math
 import time
@@ -28,14 +25,8 @@ from ctypes.wintypes import DWORD
 from PIL import Image,ImageTk
 from tkinter import *
 from tkinter import font
-from PyQt5.QtCore import QThread, pyqtSignal,Qt,pyqtSlot
-from os import path
-from pynput.keyboard import Key,KeyCode, Controller,Listener
 import pyautogui
 
-from pygame import mixer
-import psutil
-import signal
 import subprocess
 import pyttsx3
 from gtts import gTTS
@@ -64,9 +55,10 @@ MOUSEEVENTF_LEFTUP   = 0x004
 
 # LIST CMD 
 OPTIONS = {'Je ne veux plus communiquer','Je veux communiquer'}
-        
+
+
 class CameraInterface(Tk):
-    def __init__(self,config_file):
+    def __init__(self,config_file, arduino_queue):
         # READ CONFIG FILE
         self.config_file = config_file
         self.config = configparser.ConfigParser()
@@ -216,7 +208,13 @@ class CameraInterface(Tk):
         self.set_cursor_pos_func = ctypes.windll.user32.SetCursorPos
         self.send_input_func = ctypes.windll.user32.SendInput
         self.last_click = time.clock()
+
+
+        # threading
+        self.arduino_queue = arduino_queue
+
         self.show_frame()
+
 
     def speak(self,text):
         self.engine.say(text)
@@ -449,19 +447,22 @@ class CameraInterface(Tk):
             # TOUCH DETECTION
             self.t = time.clock()
             if self.ser:
-                new_data = self.ser.readline().decode().rstrip()
-                if new_data != self.data_:
-                    self.buttonJustChanged = True
-                    self.data_ = new_data
-                    print(self.data_)
-                    try:
-                        self.press_keys2move(self.data_)
-                    except Exception as e:
-                        print(e)
-                        print('cannot press this key')
-                else:
-                    self.buttonJustChanged = False
-            
+                try:
+                    new_data = self.arduino_queue.get_nowait()
+                    if new_data != self.data_:
+                        self.buttonJustChanged = True
+                        self.data_ = new_data
+                        print(self.data_)
+                        try:
+                            self.press_keys2move(self.data_)
+                        except Exception as e:
+                            print(e)
+                            print('cannot press this key')
+                    else:
+                        self.buttonJustChanged = False
+                except Empty:
+                    pass
+
             if self.ser and not self.use_cam:
                 frame = np.zeros((self.cam_y,self.cam_x,3), np.uint8)
                 for iButton in range(len(self.buttons)):
@@ -540,6 +541,12 @@ class CameraInterface(Tk):
             self.lmain.after(self.refresh_rate,self.show_frame)
 
 
+def get_arduino_data(ard_queue, ser):
+    while ser:
+        new_data = ser.readline().decode().rstrip()
+        ard_queue.put(new_data)
+        time.sleep(0.5)
+
 if __name__ == "__main__":
 
     toplist = []
@@ -547,11 +554,15 @@ if __name__ == "__main__":
     #width, height= pyautogui.size()
     #win32gui.MoveWindow(grid3[0], 0, 0, width,height, False)
     config_file = r".\config.ini"
-    camInt = CameraInterface(config_file)
+
+    arduino_queue = queue.Queue()
+    camInt = CameraInterface(config_file, arduino_queue)
+    arduino_thread = threading.Thread(target=get_arduino_data, args=(arduino_queue, camInt.ser ), daemon=True, name="arduino_thread").start()
     camInt.root.mainloop()
     # mixer.quit()
     # Ensure when closing that all keys are release!
     for i,key_ in enumerate(['left','right','up','down']):
         print(i,key_)
         pyautogui.keyUp(key_)
-
+        
+        
