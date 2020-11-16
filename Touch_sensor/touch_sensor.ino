@@ -78,7 +78,7 @@ void loop() {
       case 9:
         Keyboard.press(KEY_LEFT_ARROW);
         break;
+    delay(200);
     } */
     
-  delay(200);
-}
+  }
