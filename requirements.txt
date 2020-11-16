@@ -5,5 +5,8 @@ Pillow
 numpy
 mouse
 pyserial
+pyautogui
+pyttsx3
+gtts
+pywin32
 # pyqt
-
