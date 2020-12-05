@@ -1,4 +1,11 @@
-#import mouse
+''' 
+Project HandTracking4Sohan - developped during HackaHealth Hackathon 2020 
+12/05/2020 Lausanne,Switzerland
+Camera_Interface 
+Contact: hackahealth.geneva@gmail.com, bastien.orset@epfl.ch
+Autors: Bastien Orset (inlcudes your name if you contributed)
+'''
+
 import os
 import time
 import PIL
@@ -26,10 +33,14 @@ from PIL import Image,ImageTk
 from tkinter import *
 from tkinter import font
 import pyautogui
-
 import subprocess
-import pyttsx3
-from gtts import gTTS
+
+'''
+TO DO
+
+
+'''
+
 
 class MOUSEINPUT(ctypes.Structure):
     _fields_ = [
@@ -55,7 +66,6 @@ MOUSEEVENTF_LEFTUP   = 0x004
 
 # LIST CMD 
 OPTIONS = {'Je ne veux plus communiquer','Je veux communiquer'}
-
 
 class CameraInterface(Tk):
     def __init__(self,config_file, arduino_queue):
@@ -120,19 +130,19 @@ class CameraInterface(Tk):
         
         # Interface 
         self.lmain = Label(self.root)
-        # self.red = Button(self.root, text="red", command=self.detectRed,font=("Helvetica", 11,'bold'),state='disabled',bg='gray72')
-        # self.green = Button(self.root, text="green", command=self.detectGreen,font=("Helvetica", 11,'bold'),state='disabled',bg='gray72')
-        # self.blue = Button(self.root, text="blue", command=self.detectBlue,font=("Helvetica", 11,'bold'),state='disabled',bg='gray72')
         self.camera_pic = PhotoImage(file=".\Picture_Button\camera_pic.png")
         self.sensor_pic = PhotoImage(file=".\Picture_Button\sensor_pic.png")
         self.LabelController = Label(self.root, text="Controller",font=("Helvetica", 13,'bold'),justify=CENTER,bg='Sky Blue')
         f = font.Font(self.LabelController, self.LabelController.cget("font"))
         f.configure(underline = True)
         self.LabelController.configure(font=f)
+
         self.mouseCheckbox = Checkbutton(self.root, text=" Mouse", variable=self.varMouse,font=("Helvetica", 11), 
         	command=self.mouseMovement,background="Sky Blue",state='normal',image =self.camera_pic, compound='left')
+
         self.KeysCheckbox = Checkbutton(self.root, text="Sensor", variable=self.varKeys,font=("Helvetica", 11), 
-        	command=self.keyMovement,background="Sky Blue",image =self.sensor_pic, compound='left',state='disabled')
+        	command=self.keyMovement,background="Sky Blue",image =self.sensor_pic, compound='left',state=stateButtonKeys)
+
         self.LabelApp= Label(self.root, text="Applications",font=("Helvetica", 13,'bold'),justify=CENTER,bg='Sky Blue')
         f = font.Font(self.LabelApp, self.LabelApp.cget("font"))
         f.configure(underline = True)
@@ -142,21 +152,20 @@ class CameraInterface(Tk):
         self.gameButton = Button(self.root, image=self.loadimage1,command=self.launch_grid,background="Sky Blue")  # REMEMBER TO CHANGE
         self.gameButton["border"] = "0"
 
-        self.loadimage2 = PhotoImage(file=".\Picture_Button\parler_start.png")
-        self.grid3Button = Button(self.root, image=self.loadimage2,command=self.launch_grid,background="Sky Blue")  # REMEMBER TO CHANGE
-        self.grid3Button["border"] = "0"
-
         self.lmain.grid(row=0, column=0, columnspan=4,padx=50,pady=20)
-        # self.red.grid(row=1, column=0, sticky='nesw',padx=10,pady=1)
-        # self.green.grid(row=2, column=0, sticky='nesw',padx=10,pady=1)
-        # self.blue.grid(row=3, column=0, sticky='nesw',padx=10,pady=1)
         self.LabelController.grid(row=1, column=0, columnspan=4,sticky='nesw',pady=10)
         self.KeysCheckbox.grid(row=2, column=0,columnspan=2,  sticky='nesw')
         self.mouseCheckbox.grid(row=2, column=2,columnspan=2,  sticky='nesw')
         self.LabelApp.grid(row=3, column=0, columnspan=4,sticky='nesw',pady=10)
         self.gameButton.grid(row=4,column=0,columnspan=2,sticky='nesw',padx=10,pady=20)
-        self.grid3Button.grid(row=4,column=2,columnspan=2,sticky='nesw',pady=20)
         
+        self.loadimage2 = PhotoImage(file=".\Picture_Button\parler_start.png")
+        self.grid3Button = Button(self.root, image=self.loadimage2,command=self.launch_grid,background="Sky Blue")  # REMEMBER TO CHANGE
+        self.grid3Button["border"] = "0"
+        self.grid3Button.grid(row=4,column=2,columnspan=2,sticky='nesw',pady=20)
+
+
+
         # Screen size
         self.screen_x = self.root.winfo_screenwidth()
         self.screen_y = self.root.winfo_screenheight()
@@ -194,16 +203,10 @@ class CameraInterface(Tk):
         self.current_button_selected = None
 
         # SOUND FEEDBACK
-        self.engine=pyttsx3.init('sapi5')
-        voices=self.engine.getProperty('voices')
-        self.engine.setProperty('voice','voices[0].id')
+        # self.engine=pyttsx3.init('sapi5')
+        # voices=self.engine.getProperty('voices')
+        # self.engine.setProperty('voice','voices[0].id')
 
-        # mixer.init()
-        # self.sound_path = r'.\Sound'
-        # if not os.path.exists(self.sound_path):
-        #     self.loading_sound_on_computer(OPTIONS)
-        
-        
         # Initialization for Mouse Controller
         self.set_cursor_pos_func = ctypes.windll.user32.SetCursorPos
         self.send_input_func = ctypes.windll.user32.SendInput
@@ -216,10 +219,10 @@ class CameraInterface(Tk):
         self.show_frame()
 
 
-    def speak(self,text):
-        self.engine.say(text)
-        time.sleep(0.5)
-        print('say something')
+    # def speak(self,text):
+    #     self.engine.say(text)
+    #     time.sleep(0.5)
+    #     print('say something')
 
     def connect_to_arduino_if_exist(self):
         print("Connection to Arduino")
@@ -255,6 +258,10 @@ class CameraInterface(Tk):
         try: 
             #os.startfile(self.path_grid3)
             self.shell_process = subprocess.Popen([self.path_grid3],shell=True) 
+            root = window.TKroot
+            self.root.attributes('-topmost', True)
+            self.root.attributes('-topmost', False)
+            self.window.BringToFront()
         except Exception as e:
             print(e)
             print('Cannot launch Grid3')
@@ -268,17 +275,17 @@ class CameraInterface(Tk):
             print(e)
             print('Cannot close Grid3')
         
-    def detectRed(self):
-        self.lowerBound = np.array([170, 120, 150])
-        self.upperBound = np.array([190, 255, 255])
+    # def detectRed(self):
+    #     self.lowerBound = np.array([170, 120, 150])
+    #     self.upperBound = np.array([190, 255, 255])
 
-    def detectGreen(self):
-        self.lowerBound = np.array([29, 86, 6])
-        self.upperBound = np.array([64, 255, 255])
+    # def detectGreen(self):
+    #     self.lowerBound = np.array([29, 86, 6])
+    #     self.upperBound = np.array([64, 255, 255])
 
-    def detectBlue(self):
-        self.lowerBound = np.array([110, 150, 100])
-        self.upperBound = np.array([120, 255, 255])
+    # def detectBlue(self):
+    #     self.lowerBound = np.array([110, 150, 100])
+    #     self.upperBound = np.array([120, 255, 255])
     
     def press_keys2move(self,data):
         iSelectedButton = self.listValues_capacitive_sensor.index(data)
@@ -318,33 +325,28 @@ class CameraInterface(Tk):
         # Launch Interface
         if data == self.buttons[1][2]:
             if not self.gridIsOpen:
-                self.speak("Je veux communiquer")
+                # self.speak("Je veux communiquer")
                 self.launch_grid()
                 self.gridIsOpen = True
-                # mixer.music.load(os.path.join(self.sound_path,'Je veux communiquer.mp3'))
-                # mixer.music.play()
                 print("Tentative to open Grid")
             else:
-                self.speak("Je ne veux plus communiquer")
+                # self.speak("Je ne veux plus communiquer")
                 self.close_grid()
-                # mixer.music.load(os.path.join(self.sound_path,'Je ne veux plus communiquer.mp3'))
-                # mixer.music.play()
-                
                 self.gridIsOpen = False
                 print("Tentative to close Grid")
     
-    def loading_sound_on_computer(self,OPTIONS):
-        engine = pyttsx3.init(driverName='sapi5')
-        print("*** Creating Sound folder ****")
-        folderData = ".\Sound"
-        if not os.path.exists(folderData):
-            os.makedirs(folderData)
-        for i,opt in enumerate(OPTIONS):
-            print(opt)
-            theText = opt
-            tts = gTTS(text=theText, lang='en')
-            tts.save(os.path.join(folderData,theText + ".mp3"))
-        print("File saved!")
+    # def loading_sound_on_computer(self,OPTIONS):
+    #     engine = pyttsx3.init(driverName='sapi5')
+    #     print("*** Creating Sound folder ****")
+    #     folderData = ".\Sound"
+    #     if not os.path.exists(folderData):
+    #         os.makedirs(folderData)
+    #     for i,opt in enumerate(OPTIONS):
+    #         print(opt)
+    #         theText = opt
+    #         tts = gTTS(text=theText, lang='en')
+    #         tts.save(os.path.join(folderData,theText + ".mp3"))
+    #     print("File saved!")
     
     def mouseMovement(self):
         if self.varMouse.get():
@@ -384,7 +386,6 @@ class CameraInterface(Tk):
         if self.t - self.last_click > 0.3:
             # Every 0.3 seconds perform clicks
             if isInGrid3Boolean:
-                print('Click')
                 # To click I need to fill INPUT structure
                 inp = INPUT()
                 inp.type = INPUT_MOUSE
@@ -542,10 +543,11 @@ class CameraInterface(Tk):
 
 
 def get_arduino_data(ard_queue, ser):
+    time.sleep(0.1)
     while ser:
         new_data = ser.readline().decode().rstrip()
         ard_queue.put(new_data)
-        time.sleep(0.5)
+        
 
 if __name__ == "__main__":
 
