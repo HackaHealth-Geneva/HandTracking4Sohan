@@ -34,6 +34,8 @@ from tkinter import *
 from tkinter import font
 import pyautogui
 
+import mediapipe as mp
+
 '''
 TO DO
 
@@ -62,6 +64,8 @@ INPUT_MOUSE = 0
 MOUSEEVENTF_MOVE     = 0x001
 MOUSEEVENTF_LEFTDOWN = 0x002
 MOUSEEVENTF_LEFTUP   = 0x004
+
+LIST_INDEX_TIP = [4,8,12,16,20]
 
 class CameraInterface(Tk):
     def __init__(self,config_file, arduino_queue):
@@ -106,6 +110,10 @@ class CameraInterface(Tk):
         ctrl_flip_x = self.config.getboolean("mouseController","ctrl_flip_x")
         ctrl_flip_y = self.config.getboolean("mouseController","ctrl_flip_y")
 
+        # Tracking Methods
+        tracking_Color = self.config.getboolean("tracking_method","tracking_Color")
+        tracking_DL = self.config.getboolean("tracking_method","tracking_DL")
+        self.index_joints_2use_DL = self.config.getint("tracking_method","index_joints_2use_DL")
 
         # Initializations of kernel and cam
         self.kernelOpen = np.ones((kernel_o, kernel_o))
@@ -147,16 +155,28 @@ class CameraInterface(Tk):
         self.ctrl_do_flip_Y = BooleanVar()
         self.ctrl_do_flip_Y.set(ctrl_flip_y)
         
+        
+        self.tracking_DL = BooleanVar()
+        self.tracking_DL.set(tracking_DL)
+        self.tracking_Color = BooleanVar()
+        self.tracking_Color.set(tracking_Color)
+        
         menubar = Menu(self.root)
         view_menu = Menu(menubar)
         view_menu.add_checkbutton(label="Flip X", onvalue=1, offvalue=0, variable=self.cam_do_flip_X)
         view_menu.add_checkbutton(label="Flip Y", onvalue=1, offvalue=0, variable=self.cam_do_flip_Y)
+        
         ctrl_menu = Menu(menubar)
-        ctrl_menu.add_checkbutton(label="Flip X", onvalue=1, offvalue=0, variable=self.ctrl_do_flip_Y)
-        ctrl_menu.add_checkbutton(label="Flip Y", onvalue=1, offvalue=0, variable=self.ctrl_do_flip_X)
+        ctrl_menu.add_checkbutton(label="Flip X", onvalue=1, offvalue=0, variable=self.tracking_DL)
+        ctrl_menu.add_checkbutton(label="Flip Y", onvalue=1, offvalue=0, variable= not self.tracking_DL)
+        
+        tracking_menu = Menu(menubar)
+        tracking_menu.add_checkbutton(label="Tracking DL", onvalue=1, offvalue=0, command=self.select_tracking_method1,variable=self.tracking_DL)
+        tracking_menu.add_checkbutton(label="Tracking Color", onvalue=1, offvalue=0,command=self.select_tracking_method2,variable=self.tracking_Color)
         
         menubar.add_cascade(label='Camera', menu=view_menu)
         menubar.add_cascade(label='Mouse', menu=ctrl_menu)
+        menubar.add_cascade(label='Tracking', menu=tracking_menu)
         self.root.config(menu=menubar)
         
         # Interface 
@@ -237,7 +257,26 @@ class CameraInterface(Tk):
         # Threading
         self.arduino_queue = arduino_queue
         
+        # Hands Pose estimation parameters
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.mp_hands = mp.solutions.hands
+        self.hands_model = self.mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
+        self.hand_landmarks = None
+
         self.show_frame()
+
+    def select_tracking_method1(self):
+        if self.tracking_DL.get():
+            self.tracking_Color.set(False)
+        else:
+            self.tracking_Color.set(True)
+    
+    def select_tracking_method2(self):
+        if self.tracking_Color.get():
+            self.tracking_DL.set(False)
+        else:
+            self.tracking_DL.set(True)
+
 
     def connect_to_arduino_if_exist(self):
         print("Connection to Arduino")
@@ -445,6 +484,7 @@ class CameraInterface(Tk):
                          
             # CAMERA HAND TRACKING
             elif self.use_cam:
+                conts = None
                 # Check if mouse is in Grid3 = if yes allow click otherwise no
                 win32gui.EnumWindows(self.enum_callback, toplist)
                 grid3 = [(hwnd, title) for hwnd, title in winlist if title.startswith('Grid 3')]
@@ -467,32 +507,55 @@ class CameraInterface(Tk):
                     self.img = cv2.flip(self.img, 0)
 
                 self.img = cv2.resize(self.img, (self.cam_x, self.cam_y))
-                # convert BGR to HSV
-                frame = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
-                imgHSV = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
-                # create the Mask + morphology
-                mask = cv2.inRange(imgHSV, self.lowerBound, self.upperBound)
-                maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernelOpen)
-                maskClose = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, self.kernelClose)
-                maskFinal = maskClose
-                im2, conts, hierarchy = cv2.findContours( maskFinal.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-                # Drawing 
-                cv2.drawContours(frame, conts, -1, (255, 0, 0), 3)
-                if conts:
-                    x, y, w, h = cv2.boundingRect(conts[0])
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-                    x1, y1, w1, h1 = cv2.boundingRect(conts[0])
-                    center_x = int(x1 + w1 / 2)
-                    center_y = int(y1 + h1 / 2)
-                    cv2.circle(frame, (center_x, center_y), 2, (0, 0, 255), 2)
+                if self.tracking_Color.get():
+                    # convert BGR to HSV
+                    frame = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
+                    imgHSV = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
+                    # create the Mask + morphology
+                    mask = cv2.inRange(imgHSV, self.lowerBound, self.upperBound)
+                    maskOpen = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernelOpen)
+                    maskClose = cv2.morphologyEx(maskOpen, cv2.MORPH_CLOSE, self.kernelClose)
+                    maskFinal = maskClose
+                    im2, conts, hierarchy = cv2.findContours( maskFinal.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+                    # Drawing 
+                    cv2.drawContours(frame, conts, -1, (255, 0, 0), 3)
+                    if conts:
+                        x, y, w, h = cv2.boundingRect(conts[0])
+                        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                        x1, y1, w1, h1 = cv2.boundingRect(conts[0])
+                        center_x = int(x1 + w1 / 2)
+                        center_y = int(y1 + h1 / 2)
+                        cv2.circle(frame, (center_x, center_y), 2, (0, 0, 255), 2)
+                
+                if self.tracking_DL.get():
+                    self.img.flags.writeable = False
+                    results = self.hands_model.process(self.img)
+                    # Draw the hand annotations on the image.
+                    self.img.flags.writeable = True
+                    frame = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
+                    if results.multi_hand_landmarks:
+                      for hand_landmarks in results.multi_hand_landmarks:
+                        self.mp_drawing.draw_landmarks(
+                            frame, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
+                        image_rows, image_cols, _ = frame.shape
+                        idx_to_coordinates = {}
+                        for idx, landmark in enumerate(hand_landmarks.landmark):
+                          if landmark.visibility < 0 or landmark.presence < 0:
+                            continue
+                          conts = self.mp_drawing._normalized_to_pixel_coordinates(landmark.x, landmark.y,
+                                                                         image_cols, image_rows)
+                          if idx == self.index_joints_2use_DL and conts:
+                            cv2.circle(frame, conts, 10,(0,200,0), -1)
+                            center_x,center_y = conts
 
-                    if self.ctrl_do_flip_X.get():
-                       center_x = self.cam_x - int(x1 + w1 / 2)
-                    if self.ctrl_do_flip_Y.get():
-                       center_y = self.cam_y - int(y1 + h1 / 2)
-                    
-                    self.mouseLoc = ( (center_x * self.screen_x / self.cam_x), center_y * self.screen_y / self.cam_y)
                 if self.varMouse.get() and conts:
+                    if self.ctrl_do_flip_X.get():
+                        center_x = self.cam_x - center_x
+                    if self.ctrl_do_flip_Y.get():
+                        center_y = self.cam_y - center_y
+                        # Translate position into mouse
+                        self.mouseLoc = ( (center_x * self.screen_x / self.cam_x), center_y * self.screen_y / self.cam_y)
+
                     self.control_cursor_mvt(self.mouseLoc,isInGrid3Boolean)
                     self.current_mouse_location = self.mouseLoc
 
