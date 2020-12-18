@@ -167,8 +167,8 @@ class CameraInterface(Tk):
         view_menu.add_checkbutton(label="Flip Y", onvalue=1, offvalue=0, variable=self.cam_do_flip_Y)
         
         ctrl_menu = Menu(menubar)
-        ctrl_menu.add_checkbutton(label="Flip X", onvalue=1, offvalue=0, variable=self.tracking_DL)
-        ctrl_menu.add_checkbutton(label="Flip Y", onvalue=1, offvalue=0, variable= not self.tracking_DL)
+        ctrl_menu.add_checkbutton(label="Flip X", onvalue=1, offvalue=0, variable=self.ctrl_do_flip_X)
+        ctrl_menu.add_checkbutton(label="Flip Y", onvalue=1, offvalue=0, variable= self.ctrl_do_flip_Y)
         
         tracking_menu = Menu(menubar)
         tracking_menu.add_checkbutton(label="Tracking DL", onvalue=1, offvalue=0, command=self.select_tracking_method1,variable=self.tracking_DL)
@@ -260,8 +260,7 @@ class CameraInterface(Tk):
         # Hands Pose estimation parameters
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_hands = mp.solutions.hands
-        self.hands_model = self.mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
-        self.hand_landmarks = None
+        self.hands_model = self.mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
         self.show_frame()
 
@@ -487,7 +486,10 @@ class CameraInterface(Tk):
                 conts = None
                 # Check if mouse is in Grid3 = if yes allow click otherwise no
                 win32gui.EnumWindows(self.enum_callback, toplist)
-                grid3 = [(hwnd, title) for hwnd, title in winlist if title.startswith('Grid 3')]
+                try:
+                    grid3 = [(hwnd, title) for hwnd, title in winlist if title.startswith('Grid 3')]
+                except:
+                    grid3 = None
 
                 if grid3 and self.mouseLoc[0] is not None: 
                     print(grid3)
@@ -499,14 +501,19 @@ class CameraInterface(Tk):
 
                 # Image Processing
                 ret, self.img = self.cam.read()
-                # flipping for the selfie cam right now to keep same
                 
+                if not ret:
+                    print("Ignoring empty camera frame.")
+                    pass
+
+                # flipping for the selfie cam right now to keep same
                 if self.cam_do_flip_X.get():
                    self.img = cv2.flip(self.img, 1)
                 if self.cam_do_flip_Y.get():
                     self.img = cv2.flip(self.img, 0)
 
                 self.img = cv2.resize(self.img, (self.cam_x, self.cam_y))
+                # HSV FILTER METHOD
                 if self.tracking_Color.get():
                     # convert BGR to HSV
                     frame = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
@@ -527,26 +534,31 @@ class CameraInterface(Tk):
                         center_y = int(y1 + h1 / 2)
                         cv2.circle(frame, (center_x, center_y), 2, (0, 0, 255), 2)
                 
+                # HAND POSE ESTIMATION METHOD
                 if self.tracking_DL.get():
+                    print("AA")
                     self.img.flags.writeable = False
+                    self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
                     results = self.hands_model.process(self.img)
                     # Draw the hand annotations on the image.
                     self.img.flags.writeable = True
-                    frame = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
+
+                    frame = self.img
+                    image_rows, image_cols, _ = frame.shape
+                    
                     if results.multi_hand_landmarks:
-                      for hand_landmarks in results.multi_hand_landmarks:
-                        self.mp_drawing.draw_landmarks(
-                            frame, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
-                        image_rows, image_cols, _ = frame.shape
-                        idx_to_coordinates = {}
-                        for idx, landmark in enumerate(hand_landmarks.landmark):
-                          if landmark.visibility < 0 or landmark.presence < 0:
-                            continue
-                          conts = self.mp_drawing._normalized_to_pixel_coordinates(landmark.x, landmark.y,
-                                                                         image_cols, image_rows)
-                          if idx == self.index_joints_2use_DL and conts:
-                            cv2.circle(frame, conts, 10,(0,200,0), -1)
-                            center_x,center_y = conts
+                        print("A")
+                        for hand_landmarks in results.multi_hand_landmarks:
+                            self.mp_drawing.draw_landmarks(frame, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
+                            idx_to_coordinates = {}
+                            for idx, landmark in enumerate(hand_landmarks.landmark):
+                                if landmark.visibility < 0 or landmark.presence < 0:
+                                    continue
+                                conts = self.mp_drawing._normalized_to_pixel_coordinates(landmark.x, landmark.y,
+                                                                           self.cam_x, self.cam_y)
+                                if idx == self.index_joints_2use_DL and conts:
+                                    cv2.circle(frame, conts, 10,(0,200,0), -1)
+                                    center_x,center_y = conts
 
                 if self.varMouse.get() and conts:
                     if self.ctrl_do_flip_X.get():
@@ -554,8 +566,7 @@ class CameraInterface(Tk):
                     if self.ctrl_do_flip_Y.get():
                         center_y = self.cam_y - center_y
                         # Translate position into mouse
-                        self.mouseLoc = ( (center_x * self.screen_x / self.cam_x), center_y * self.screen_y / self.cam_y)
-
+                    self.mouseLoc = ( (center_x * self.screen_x / self.cam_x), center_y * self.screen_y / self.cam_y)
                     self.control_cursor_mvt(self.mouseLoc,isInGrid3Boolean)
                     self.current_mouse_location = self.mouseLoc
 
