@@ -2,20 +2,34 @@
 
 ## Challenges 
 
-Sohan is 8 years old and even if he can't speak, he likes to communicate with the people around him by using pictograms and an eye-tracker detecting his gaze to select words on his computer and speak with people. 
+Sohan is an 8 years old child that cannot speak. Thus, he needs to communicate to other people using devices such as a computer interface with eye tracking and pressing buttons. This communication was facilitated so far thanks to pictograms placed on the board in front of him and a computer with Grid3 software (https://thinksmartbox.com/product/grid-3/). This software provides a large vocabulary and numerous types of control (button, eye tracker,...)
+However, most of the controllers proposed in Grid3 interfaces require a high motor effort. Because of this, his capacity of interaction with other people is largely impaired. In this project, the main goal is to design a controller that allows him to better communicate thanks to an efficient interface requiring less physical effort.  
+Sohan has cognitive impairments that do not allow any control of his movements in general. Moreover, he cannot use fingers for pointing or typing or pressing buttons (no hand gestures). He can move only his left hand on the table. His head, very often, falls down on the left side of the body. This makes it very difficult to use eye-tracking devices to detect the gaze for leading the computer interface. 
 
-To communicate, these technological devices require a high motor effort such as pressing on some button or concentrating his gaze on the computer screen for a long period of time. As a result, Sohan's ability to communicate with us is largely impaired. In this project, the goal was to design a controller that would allow him to communicate through his interface while requiring less physical effort from him. 
+## Brainstorming
+List of the possible solutions: 
+Eye-tracker to detect the motion of his eyes; 
+Leap motion: a infrared camera to detect the motion of hands; 
+Capacitive sensors that can detect the contact (position, direction etc.) with some surfaces  of his left hand; 
+Hand tracking camera to detect the motion of his left hand via image processing and computer vision.   
+Chosen solution
+We decided to combine 2 solutions using capacitive sensors and hand tracking camera to give both discrete (keyboards) and continuous control (mouse). We discarded the eye-tracker and the leap motion because they are not able to accurately detect his eyes and hands motions for a long time due to his unsteady posture on the chair (issues with the calibration of the eyes or hands position link to the angle of the infrared camera - occlusion). Additionally, the leap motion presents a problem of reflection if put under a transparent table (the signal is not detected at all).   
+Capacitive sensors and the hand-tracking camera present different advantages:
+- Easily detect his hand motion even not accurate and precise on a specific point
+- Not sensitive to his posture or body movement
+- No calibration for the posture or the position of the body 
+- Easily control the computer interface without any physical effort
 
-Sohan has cognitive impairments that do not allow him to control of his movements in general. Moreover he doesn't have the muscular strength to use a joystick or even to press keys on a keyboards or some buttons. He can only slide his left hand on the table and he has little control over his right hand. His head, very often, falls down on the left side of the body when he's tired. This makes very difficult to use eye-tracking device to detect the gaze to lead the computer interface. 
+The combination of the two solutions could even improve the precision of motor detection and decrease the physical effort, providing more precise and clear commands to use for better communication. 
+Brief explanation on Solutions:
+1. Capacitive sensors: four arrows are displaced on the table (commands), indicating the four directions (up, down, right, left) plus another bottom in the middle (ok --> enter). We used conductor material(copper, aluminum) for the arrows to detect changes in electrical conductance when the person passes the hand over commands. The capacitive sensors are connected to an Arduino Uno that can process the signal to send to the computer interface allowing the navigation in Grid3 software. 
 
-As the best way he has to communicate is through pictograms he points with the thumb on his left hand. So this is the best sensory input we can get from Sohan and we can use this as one of the inputs, so using simple computer vision techniques we can detect a color cue placed on his thumbs with a webcam and use the posiiton of the color cue to control a pointer on Sohan's computer. Also as a complement ot the mouse control we developped capacitive sensors to act as simple touch buttons to control the directional pad of the computer and navigate more easily on his interface and also activate the hand-tracking on a computer using the camera. 
+2. Hand-tracking camera: the camera of the computer can detect the hand motion by sensors placed on the thumb and eventually on the index. The hand movement can be translated in the cursor position. Two methods can be used in the interface (HSV filter with a green patch on the hand, hand pose estimation). 
+
 
  ## Files 
  - ```requirements.txt``` : Necessary libraries to run the project. 
- 
-  
- #### Webcam camera hand detection and pointer control
-- ```CameraInterface.py``` : Creates an command interface to select red, blue and green shapes seen by the webcam. Also creates two checkboxes ```Mouse``` to allow pointer control with the webcam and ```Clic``` to allow the user to use the webcam with two green markers on the fingers and actually clic on the computer by pulling the two fingers closer together. 
+- ```CameraInterface.py``` : Interface to run 
 
 <p align="center"><img src="Media/OpenCV.png" alt="drawing" width="600"/><p>
 On the different windows we can see the masks generated as pixels labelled with 1. One is the opened version of the shape, another one is the closed shape and the difference of the two gives the contour of the original shape. 
