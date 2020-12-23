@@ -1,4 +1,4 @@
-# HandTracking4Sohan <img src="index.png" align="right" alt="drawing" width="250"/>
+# HandTracking4Sohan
 
 ## Challenges 
 
@@ -19,11 +19,11 @@ The combination of the two solutions could even improve the precision of motor d
 
 1. Capacitive sensors: four arrows are displaced on the table (commands), indicating the four directions (up, down, right, left) plus another bottom in the middle (ok --> enter). We used conductor material(copper, aluminum) for the arrows to detect changes in electrical conductance when the person passes the hand over commands. The capacitive sensors are connected to an Arduino Uno that can process the signal to send to the computer interface allowing the navigation in Grid3 software. 
 
-<p align="center"><img src="Media/board_sensors_v0.png" width="200" height="250"/><p align="center"><img src="Media/board_sensors_1.png" alt="drawing" width="200"  height="250"/><p><img src="Media/board_sensors_2.png" width="200" height="250"/><p align="center">
+<p align="center"><img src="Media/board_v0.png" width="200" height="250"/><img src="Media/board_sensors_1.jpeg" alt="drawing" width="200"  height="250"/><img src="Media/board_sensors_2.jpeg" width="200" height="250"/><p align="center">
 
 2. Hand-tracking camera: the camera of the computer can detect the hand motion by sensors placed on the thumb and eventually on the index. The hand movement can be translated in the cursor position. Two methods can be used in the interface (HSV filter with a green patch on the hand, hand pose estimation). 
 
-<p align="center"><img src="Media/interface_sensor.png" alt="drawing" width="200"  height="250"/><p><img src="Media/interface_menu.png" width="200" height="250"/><p align="center">
+<p align="center"><img src="Media/interface_sensor.png" alt="drawing" width="200"  height="300"/><img src="Media/interface_menu.png" width="200" height="300"/><p align="center">
 
 
 ## Files 
