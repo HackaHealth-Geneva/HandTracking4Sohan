@@ -37,8 +37,8 @@ By combining these two solutions, the goal was to decrease the physical effort, 
 - Run the command ```python CameraInterface.py```
 Note: for the capacitive sensors, the interface needs to be maintained Active. 
 
-#### Demo
-##### Hand Tracking & Control of Grid Interface
+## Demo
+### Hand Tracking & Control of Grid Interface
 <p align="center"><img src="Media/Mouse_HandTracker.gif" width="450" height="250"/><img src="Media/Grip3_handtracker.gif" width="150" height="250"/><p align="center">
 
 ## Further improvements
