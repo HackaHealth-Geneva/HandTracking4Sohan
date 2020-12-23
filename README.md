@@ -41,4 +41,5 @@ Note: for the capacitive sensors, the interface needs to be maintained Active.
 <p align="center"><img src="Media/Mouse_HandTracker.gif" width="450" height="250"/><img src="Media/Grip3_handtracker.gif" width="150" height="250"/><p align="center">
 
 ## Contact 
-For any questions,please contact HackaHealth on our website https://www.hackahealth.ch/ 
+This interface can be used for many applications and can be adapted for the use of everyone. 
+If you want to contribute to this project, please contact HackaHealth on our website https://www.hackahealth.ch/ 
