@@ -14,17 +14,18 @@ List of the possible solutions:
 * Hand tracking camera to detect the motion of his left hand via image processing and computer vision.   
 
 ## Chosen solution
-We decided to combine 2 solutions using capacitive sensors and hand tracking camera to give both discrete (keyboards) and continuous control (mouse). 
-The combination of the two solutions could even improve the precision of motor detection and decrease the physical effort, providing more precise and clear commands to use for better communication. 
+We designed an interface combining 2 solutions using capacitive sensors and hand tracking camera to give both discrete (keyboards) and continuous control (mouse). 
+By combining these two solutions, the goal was to decrease the physical effort, providing more precise and clear commands to use for better communication. 
+
+<p align="center"><img src="Media/interface_sensor.png" alt="drawing" width="200"  height="300"><p align="center">
 
 1. Capacitive sensors: four arrows are displaced on the table (commands), indicating the four directions (up, down, right, left) plus another bottom in the middle (ok --> enter). We used conductor material(copper, aluminum) for the arrows to detect changes in electrical conductance when the person passes the hand over commands. The capacitive sensors are connected to an Arduino Uno that can process the signal to send to the computer interface allowing the navigation in Grid3 software. 
 
-<p align="center"><img src="Media/board_v0.PNG" width="300" height="250"><img src="Media/board_sensors_2.jpeg" width="300" height="250"><p align="center">
+<p align="center"><img src="Media/board_v0.PNG" width="300" height="250" hspace="10"><img src="Media/board_sensors_2.jpeg" width="300" height="250"><p align="center">
 
 2. Hand-tracking camera: the camera of the computer can detect the hand motion by sensors placed on the thumb and eventually on the index. The hand movement can be translated in the cursor position. Two methods can be used in the interface (HSV filter with a green patch on the hand, hand pose estimation). 
 
-<p align="center"><img src="Media/interface_sensor.png" alt="drawing" width="200"  height="300"/ hspace="20"><img src="Media/interface_menu.png" width="200" height="300"><p align="center">
-
+<p align="center"><img src="Media/interface_hsv_filter.png" alt="drawing" width="200"  height="300" hspace="10"><img src="Media/interface_handpose.png" width="200" height="300"><p align="center">
 
 ## Files 
  - ```requirements.txt``` : Necessary libraries to run the project. 
