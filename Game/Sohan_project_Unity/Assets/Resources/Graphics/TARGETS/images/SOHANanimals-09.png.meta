@@ -1,0 +1,380 @@
+fileFormatVersion: 2
+guid: 6a663715907a91e43bf4745df26487af
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4684148399720099209
+    second: SOHANanimals-09_0
+  - first:
+      213: -224708475114296986
+    second: SOHANanimals-09_1
+  - first:
+      213: -1733291339206934937
+    second: SOHANanimals-09_2
+  - first:
+      213: 3190853638287424394
+    second: SOHANanimals-09_3
+  - first:
+      213: 4466670722656304062
+    second: SOHANanimals-09_4
+  - first:
+      213: -3766812978270967400
+    second: SOHANanimals-09_5
+  - first:
+      213: 3903584629566025977
+    second: SOHANanimals-09_6
+  - first:
+      213: 7422857570075615711
+    second: SOHANanimals-09_7
+  - first:
+      213: 1186181636673567926
+    second: SOHANanimals-09_8
+  - first:
+      213: 4342843683340208039
+    second: SOHANanimals-09_9
+  - first:
+      213: -1660709869991212485
+    second: SOHANanimals-09_10
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: -1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SOHANanimals-09_0
+      rect:
+        serializedVersion: 2
+        x: 612
+        y: 1188
+        width: 317
+        height: 317
+      alignment: 9
+      pivot: {x: 0.46166453, y: 0.05530825}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 772187f19df8efeb0800000000000000
+      internalID: -4684148399720099209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_1
+      rect:
+        serializedVersion: 2
+        x: 1208
+        y: 1213
+        width: 317
+        height: 317
+      alignment: 9
+      pivot: {x: 0.53066814, y: 0.039973985}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 669eaca15dca1ecf0800000000000000
+      internalID: -224708475114296986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_2
+      rect:
+        serializedVersion: 2
+        x: 573
+        y: 1035
+        width: 246
+        height: 74
+      alignment: 9
+      pivot: {x: 0.5, y: 0.49999836}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76e3f4ad5bc12f7e0800000000000000
+      internalID: -1733291339206934937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_3
+      rect:
+        serializedVersion: 2
+        x: 855
+        y: 464
+        width: 348
+        height: 698
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8b72686a70384c20800000000000000
+      internalID: 3190853638287424394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_4
+      rect:
+        serializedVersion: 2
+        x: 1268
+        y: 1013
+        width: 246
+        height: 74
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ebbf0985b5dccfd30800000000000000
+      internalID: 4466670722656304062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_5
+      rect:
+        serializedVersion: 2
+        x: 1348
+        y: 863
+        width: 85
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 899e3debd8799bbc0800000000000000
+      internalID: -3766812978270967400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_6
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 698
+        width: 191
+        height: 134
+      alignment: 9
+      pivot: {x: 0.83473086, y: 0.6813755}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f035fbd9815c2630800000000000000
+      internalID: 3903584629566025977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_7
+      rect:
+        serializedVersion: 2
+        x: 1696
+        y: 658
+        width: 156
+        height: 188
+      alignment: 9
+      pivot: {x: 0.3067009, y: 0.8258284}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd12daac1a9430760800000000000000
+      internalID: 7422857570075615711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_8
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 358
+        width: 150
+        height: 189
+      alignment: 9
+      pivot: {x: 0.28935924, y: 0.8600687}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6bcf405f9e9267010800000000000000
+      internalID: 1186181636673567926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_9
+      rect:
+        serializedVersion: 2
+        x: 1606
+        y: 311
+        width: 134
+        height: 190
+      alignment: 9
+      pivot: {x: 0.64694625, y: 0.8364928}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a7ca841251e44c30800000000000000
+      internalID: 4342843683340208039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SOHANanimals-09_10
+      rect:
+        serializedVersion: 2
+        x: 693
+        y: 123
+        width: 249
+        height: 144
+      alignment: 9
+      pivot: {x: 0.9392409, y: 0.06116507}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3a403c0c29f3f8e0800000000000000
+      internalID: -1660709869991212485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
