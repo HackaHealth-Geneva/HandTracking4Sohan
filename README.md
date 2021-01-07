@@ -42,7 +42,7 @@ Note: for the capacitive sensors, the interface needs to be maintained Active.
 
 ## Game
 We designed a game in Unity3D to test the system with Sohan. It consist on an application where he has to select the character that appears at the beginning of the scene using the hand tracking or the capacitive sensors interface.
-<p align="center"><img src="Media/Game.GIF" width="360" height="203"/><p align="center">
+<p align="center"><img src="Media/Game.gif" width="360" height="203"/><p align="center">
 
 ## Contact 
 This interface can be used for many applications and can be adapted for the use of everyone. 
