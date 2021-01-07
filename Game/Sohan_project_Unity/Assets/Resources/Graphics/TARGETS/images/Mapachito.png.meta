@@ -1,0 +1,332 @@
+fileFormatVersion: 2
+guid: c5b691dabd51db44b9dd3e2ec5bbe849
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 927255586821249841
+    second: Mapachito_0
+  - first:
+      213: 699914166004750567
+    second: Mapachito_1
+  - first:
+      213: -160649531305094919
+    second: Mapachito_2
+  - first:
+      213: -4142464169033976720
+    second: Mapachito_3
+  - first:
+      213: 6029172577255954041
+    second: Mapachito_4
+  - first:
+      213: 4324200199395831087
+    second: Mapachito_5
+  - first:
+      213: 2098911877654175081
+    second: Mapachito_0
+  - first:
+      213: -922357955435119884
+    second: Mapachito_1
+  - first:
+      213: -6760172858914917756
+    second: Mapachito_2
+  - first:
+      213: -1059127019669309973
+    second: Mapachito_3
+  - first:
+      213: 1370701939066062389
+    second: Mapachito_4
+  - first:
+      213: 4237538871041237476
+    second: Mapachito_5
+  - first:
+      213: -7250007559790403601
+    second: Mapachito_6
+  - first:
+      213: 2661890715294519773
+    second: Mapachito_7
+  - first:
+      213: 4426459453789593096
+    second: Mapachito_6
+  - first:
+      213: 3131438558160651053
+    second: Mapachito_7
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: -1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Mapachito_0
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 1087
+        width: 275
+        height: 398
+      alignment: 9
+      pivot: {x: 0.4920606, y: 0.95531154}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96ddc627b35d02d10800000000000000
+      internalID: 2098911877654175081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mapachito_1
+      rect:
+        serializedVersion: 2
+        x: 618
+        y: 1106
+        width: 164
+        height: 221
+      alignment: 9
+      pivot: {x: 0.83282024, y: 0.11471074}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4fab88e83502333f0800000000000000
+      internalID: -922357955435119884
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mapachito_2
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 1106
+        width: 152
+        height: 221
+      alignment: 9
+      pivot: {x: 0.18399529, y: 0.07519421}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 482b32c0a9a0f22a0800000000000000
+      internalID: -6760172858914917756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mapachito_3
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 831
+        width: 203
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be5b79c46993d41f0800000000000000
+      internalID: -1059127019669309973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mapachito_4
+      rect:
+        serializedVersion: 2
+        x: 607
+        y: 658
+        width: 600
+        height: 432
+      alignment: 9
+      pivot: {x: 0.48544455, y: 0.050199296}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 536c8fab626b50310800000000000000
+      internalID: 1370701939066062389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mapachito_5
+      rect:
+        serializedVersion: 2
+        x: 1319
+        y: 303
+        width: 502
+        height: 629
+      alignment: 9
+      pivot: {x: 0.23034887, y: 0.08347179}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e1a25ad623ceca30800000000000000
+      internalID: 4237538871041237476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mapachito_6
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 415
+        width: 96
+        height: 265
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9448993}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 80e5ccbbb61fd6d30800000000000000
+      internalID: 4426459453789593096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mapachito_7
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 114
+        width: 101
+        height: 133
+      alignment: 9
+      pivot: {x: 0.47838297, y: 0.91039455}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d23802f07ca157b20800000000000000
+      internalID: 3131438558160651053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: bbdd2acb6ad630f4ab98f0144d29b234
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

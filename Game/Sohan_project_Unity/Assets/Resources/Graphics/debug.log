@@ -1,0 +1,24 @@
+[1115/192354.982:ERROR:browser_gpu_channel_host_factory.cc(139)] Failed to launch GPU process.
+[1118/200153.255:INFO:CONSOLE(1)] "Failed to initialize cached content:", source: file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/spaces.js (1)
+[1118/200155.084:INFO:CONSOLE(1)] "%cUnhandled rejection TypeError: Cannot read property 'playlistUUID' of undefined
+    at f.updateTracks (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:88731)
+    at O.addContent (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:79602)
+    at s.forEach.e (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:78692)
+    at Array.forEach (<anonymous>)
+    at O.<anonymous> (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:78675)
+    at O.<anonymous> (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:79233)
+    at l (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:215141)
+    at j._settlePromiseFromHandler (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:188262)
+    at j._settlePromise (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:189062)
+    at j._settlePromise0 (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:189761)
+    at j._settlePromises (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:191088)
+    at file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:145301
+From previous event:
+    at j.I [as _captureStackTrace] (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:158681)
+    at j._then (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:183730)
+    at j.then (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:182086)
+    at Object.<anonymous> (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:69843)
+    at o (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/spaces.js:1:410)
+    at window.webpackJsonp (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/spaces.js:1:284)
+    at file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:1", source: file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js (1)
+[1118/200406.332:ERROR:browser_gpu_channel_host_factory.cc(139)] Failed to launch GPU process.

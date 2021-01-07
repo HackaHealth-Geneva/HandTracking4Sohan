@@ -1,0 +1,29 @@
+[1119/182701.963:INFO:CONSOLE(1)] "Failed to initialize cached content:", source: file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/spaces.js (1)
+[1119/182703.235:INFO:CONSOLE(1)] "%cUnhandled rejection TypeError: Cannot read property 'playlistUUID' of undefined
+    at f.updateTracks (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:88731)
+    at O.addContent (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:79602)
+    at s.forEach.e (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:78692)
+    at Array.forEach (<anonymous>)
+    at O.<anonymous> (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:78675)
+    at O.<anonymous> (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:79233)
+    at l (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:215141)
+    at j._settlePromiseFromHandler (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:188262)
+    at j._settlePromise (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:189062)
+    at j._settlePromise0 (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:189761)
+    at j._settlePromises (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:191088)
+    at file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:145301
+From previous event:
+    at j.I [as _captureStackTrace] (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:158681)
+    at j._then (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:183730)
+    at j.then (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js:1:182086)
+    at Object.<anonymous> (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:69843)
+    at o (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/spaces.js:1:410)
+    at window.webpackJsonp (file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/spaces.js:1:284)
+    at file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/main.js:1:1", source: file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-learn/build/external.js (1)
+[1119/184758.109:INFO:CONSOLE(1)] "Long rAF frame-time", source: file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-rich-tooltips/build/external.js (1)
+[1119/184758.186:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 1612
+[1119/184758.186:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 842
+[1119/184758.208:WARNING:angle_platform_impl.cc(52)] compileToBinary(230): 
+C:\fakepath(69,8-58): warning X3571: pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+C:\fakepath(77,9-43): warning X3571: pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+
