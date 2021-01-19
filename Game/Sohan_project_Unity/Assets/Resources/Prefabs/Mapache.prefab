@@ -669,7 +669,7 @@ GameObject:
   - component: {fileID: 1312342201971691997}
   m_Layer: 0
   m_Name: Mapache
-  m_TagString: NoTarget
+  m_TagString: Target
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
